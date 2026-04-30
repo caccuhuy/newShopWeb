@@ -61,7 +61,7 @@ const Header = () => {
                     {isAuthenticated ? (
                         <div className={styles.userMenu}>
                             <User className={styles.userIconSmall} />
-                            <span className={styles.userName}>{user.name}</span>
+                            <span className={styles.userName}>{user?.name}</span>
                             <button onClick={logout} className={styles.logoutBtn}>
                                 <LogOut className={styles.logoutIcon} />
                             </button>

@@ -121,6 +121,23 @@
     gap: 2rem;
 }
 
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2.5rem 0;
+}
+
+.empty {
+    text-align: center;
+    padding: 5rem 0;
+    color: #6b7280;
+}
+
 @media (min-width: 1024px) {
     .grid {
         grid-template-columns: repeat(4, 1fr);

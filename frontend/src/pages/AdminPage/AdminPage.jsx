@@ -4,11 +4,12 @@ import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import Modal from '../../components/Modal/Modal';
 import { apiService } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
-import { Download, Plus, Search, Bell } from 'lucide-react';
+import { Download, Plus, Bell } from 'lucide-react';
 import styles from './AdminPage.module.css';
+import { clsx } from 'clsx';
 
 const AdminPage = () => {
-    const { isStaff, isAdmin, user } = useAuth();
+    const { isStaff, isAdmin } = useAuth();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -99,34 +100,31 @@ const AdminPage = () => {
                     </div>
                     <div className={styles.actions}>
                         <button className={styles.btnExport} onClick={exportCSV}>Xuất báo cáo</button>
-                        {/* CHỈ ADMIN MỚI THẤY NÚT TẠO PHIẾU MỚI */}
                         {isAdmin && (
                             <button className={styles.btnPrimary} onClick={() => setShowModal(true)}>Tạo phiếu mới</button>
                         )}
                     </div>
                 </header>
 
-                {/* Grid Phím tắt */}
                 <div className={styles.quickStats}>
                     <div className={styles.quickCard}>
-                        <div className={`${styles.iconCircle} bg-blue-50 text-[#3451B2]`}>🏢</div>
+                        <div className={clsx(styles.iconCircle, styles.bgBlue)}>🏢</div>
                         <p className={styles.quickLabel}>Nhà cung cấp</p>
                     </div>
                     <div className={styles.quickCard}>
-                        <div className={`${styles.iconCircle} bg-purple-50 text-purple-600`}>📄</div>
+                        <div className={clsx(styles.iconCircle, styles.bgPurple)}>📄</div>
                         <p className={styles.quickLabel}>Các loại phiếu</p>
                     </div>
                     <div className={styles.quickCard}>
-                        <div className={`${styles.iconCircle} bg-green-50 text-green-600`}>🏠</div>
+                        <div className={clsx(styles.iconCircle, styles.bgGreen)}>🏠</div>
                         <p className={styles.quickLabel}>Tình trạng kho</p>
                     </div>
                     <div className={styles.quickCard}>
-                        <div className={`${styles.iconCircle} bg-orange-50 text-orange-600`}>📈</div>
+                        <div className={clsx(styles.iconCircle, styles.bgOrange)}>📈</div>
                         <p className={styles.quickLabel}>Báo cáo thống kê</p>
                     </div>
                 </div>
 
-                {/* Dashboard Chính */}
                 <div className={styles.mainGrid}>
                     <section className={styles.chartSection}>
                         <div className={styles.sectionTitle}>
@@ -139,10 +137,10 @@ const AdminPage = () => {
                             <div className={styles.bar} style={{ height: '35%' }}></div>
                             <div className={styles.bar} style={{ height: '80%' }}></div>
                             <div className={styles.bar} style={{ height: '70%' }}></div>
-                            <div className={`${styles.bar} ${styles.barActive}`} style={{ height: '90%' }}></div>
+                            <div className={clsx(styles.bar, styles.barActive)} style={{ height: '90%' }}></div>
                             <div className={styles.bar} style={{ height: '50%' }}></div>
                         </div>
-                        <div className="flex justify-between mt-4 text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+                        <div className={styles.chartLegend}>
                             <span>Tháng trước</span>
                             <span>Hiện tại</span>
                         </div>
@@ -150,29 +148,28 @@ const AdminPage = () => {
 
                     <div className={styles.sideCards}>
                         <article className={styles.countCard}>
-                            <p className={styles.countLabel}>Số lượng đơn hàng</p>
+                            <p className={styles.countXS}>Số lượng đơn hàng</p>
                             <h4 className={styles.countValue}>1,284</h4>
-                            <p className="text-[10px] text-gray-400 mt-1">Kỳ hạn: Tháng 10/2023</p>
-                            <div className="w-full bg-gray-50 h-1.5 rounded-full mt-6">
-                                <div className="bg-[#3451B2] w-3/4 h-full rounded-full"></div>
+                            <p className={styles.countSub}>Kỳ hạn: Tháng 10/2023</p>
+                            <div className={styles.progressTrack}>
+                                <div className={styles.progressBar}></div>
                             </div>
                         </article>
 
                         <article className={styles.alertCard}>
-                            <div className="flex items-center gap-3 mb-4">
-                                <Bell size={16} className="animate-bounce" />
+                            <div className={styles.alertHeader}>
+                                <Bell size={16} className={styles.animateBounce} />
                                 <h4 className={styles.alertTitle}>Cảnh báo tồn kho</h4>
                             </div>
                             <h5 className={styles.alertValue}>
                                 {products.filter(p => p.stock_quantity < 10).length < 10 ? '0' : ''}
                                 {products.filter(p => p.stock_quantity < 10).length}
                             </h5>
-                            <p className="text-[10px] text-blue-100/70 uppercase font-bold">Mặt hàng cần nhập thêm gấp</p>
+                            <p className={styles.alertDesc}>Mặt hàng cần nhập thêm gấp</p>
                         </article>
                     </div>
                 </div>
 
-                {/* Bảng Quản lý kho */}
                 <section className={styles.inventorySection}>
                     <div className={styles.tableHeader}>
                         <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Quản lý Kho hàng</h3>
@@ -201,20 +198,20 @@ const AdminPage = () => {
                                         <div className={styles.productInfo}>
                                             <img src={product.image_url} alt="" className={styles.productImg} />
                                             <div>
-                                                <div className="font-bold text-gray-900 text-sm">{product.name}</div>
-                                                <div className="text-[10px] text-gray-400 uppercase font-black">{product.brand}</div>
+                                                <div className={clsx(styles.textBold, styles.textSmall)}>{product.name}</div>
+                                                <div className={clsx(styles.textXS, styles.textMuted, styles.uppercase, styles.textBlack)}>{product.brand}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className={styles.td} style={{ textAlign: 'center' }}>
-                                        <span className={`${styles.stockBadge} ${product.stock_quantity < 10 ? styles.badgeLow : styles.badgeNormal}`}>
+                                        <span className={clsx(styles.stockBadge, product.stock_quantity < 10 ? styles.badgeLow : styles.badgeNormal)}>
                                             {product.stock_quantity}
                                         </span>
                                     </td>
                                     <td className={styles.td}>
                                         <div className={styles.rowActions}>
-                                            <button className={`${styles.miniBtn} ${styles.btnImport}`} onClick={() => handleUpdateStock(product.id, 'import')}>Nhập</button>
-                                            <button className={`${styles.miniBtn} ${styles.btnExportMini}`} onClick={() => handleUpdateStock(product.id, 'export')}>Xuất</button>
+                                            <button className={clsx(styles.miniBtn, styles.btnImport)} onClick={() => handleUpdateStock(product.id, 'import')}>Nhập</button>
+                                            <button className={clsx(styles.miniBtn, styles.btnExportMini)} onClick={() => handleUpdateStock(product.id, 'export')}>Xuất</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -224,26 +221,26 @@ const AdminPage = () => {
                 </section>
 
                 <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Tạo phiếu nhập hàng mới">
-                    <form onSubmit={handleAddProduct} className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-gray-600">Tên sản phẩm</label>
-                            <input type="text" className="p-2.5 border rounded-lg text-sm" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required />
+                    <form onSubmit={handleAddProduct} className={styles.form}>
+                        <div className={styles.formGroup}>
+                            <label className={styles.labelBold}>Tên sản phẩm</label>
+                            <input type="text" className={styles.inputField} value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-gray-600">Hãng sản xuất</label>
-                                <input type="text" className="p-2.5 border rounded-lg text-sm" value={newProduct.brand} onChange={e => setNewProduct({...newProduct, brand: e.target.value})} required />
+                        <div className={styles.formGrid2}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.labelBold}>Hãng sản xuất</label>
+                                <input type="text" className={styles.inputField} value={newProduct.brand} onChange={e => setNewProduct({...newProduct, brand: e.target.value})} required />
                             </div>
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-bold text-gray-600">Giá bán (VND)</label>
-                                <input type="number" className="p-2.5 border rounded-lg text-sm" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} required />
+                            <div className={styles.formGroup}>
+                                <label className={styles.labelBold}>Giá bán (VND)</label>
+                                <input type="number" className={styles.inputField} value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} required />
                             </div>
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-gray-600">URL Hình ảnh</label>
-                            <input type="text" className="p-2.5 border rounded-lg text-sm" value={newProduct.image_url} onChange={e => setNewProduct({...newProduct, image_url: e.target.value})} />
+                        <div className={styles.formGroup}>
+                            <label className={styles.labelBold}>URL Hình ảnh</label>
+                            <input type="text" className={styles.inputField} value={newProduct.image_url} onChange={e => setNewProduct({...newProduct, image_url: e.target.value})} />
                         </div>
-                        <button type="submit" className={styles.btnPrimary} style={{ width: '100%', marginTop: '1rem', padding: '1rem' }}>Lưu và Nhập kho</button>
+                        <button type="submit" className={clsx(styles.btnPrimary, styles.btnFull)}>Lưu và Nhập kho</button>
                     </form>
                 </Modal>
             </div>

@@ -8,6 +8,8 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 import AdminPage from './pages/AdminPage/AdminPage';
 import StaffManagementPage from './pages/StaffManagementPage/StaffManagementPage';
+import OrderManagementPage from './pages/OrderManagementPage/OrderManagementPage';
+import ActivityLogPage from './pages/ActivityLogPage/ActivityLogPage';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/staff" element={<StaffManagementPage />} />
+            <Route path="/admin/orders" element={<OrderManagementPage />} />
+            <Route path="/admin/logs" element={<ActivityLogPage />} />
           </Routes>
         </Router>
       </CartProvider>

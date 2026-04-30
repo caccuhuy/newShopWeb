@@ -6,6 +6,7 @@ import { apiService } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
 import { UserPlus, Trash2, RotateCcw, ShieldCheck, UserCog } from 'lucide-react';
 import styles from '../AdminPage/AdminPage.module.css';
+import { clsx } from 'clsx';
 
 const StaffManagementPage = () => {
     const { isAdmin, user: currentUser } = useAuth();
@@ -117,8 +118,8 @@ const StaffManagementPage = () => {
                                                 {item.role === 'admin' ? <ShieldCheck size={20} /> : <UserCog size={20} />}
                                             </div>
                                             <div>
-                                                <div className="font-bold text-gray-900 text-sm">{item.name}</div>
-                                                <div className="text-[10px] text-gray-400 font-black">{item.email}</div>
+                                                <div className={clsx(styles.textBold, styles.textSmall)}>{item.name}</div>
+                                                <div className={clsx(styles.textXS, styles.textMuted, styles.textBlack)}>{item.email}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -130,14 +131,14 @@ const StaffManagementPage = () => {
                                     <td className={styles.td}>
                                         <div className={styles.rowActions}>
                                             <button 
-                                                className={`${styles.miniBtn} ${styles.btnReset}`} 
+                                                className={clsx(styles.miniBtn, styles.btnReset)} 
                                                 title="Reset mật khẩu"
                                                 onClick={() => handleResetPassword(item.email)}
                                             >
                                                 <RotateCcw size={12} />
                                             </button>
                                             <button 
-                                                className={`${styles.miniBtn} ${styles.btnDelete}`} 
+                                                className={clsx(styles.miniBtn, styles.btnDelete)} 
                                                 title="Xóa tài khoản"
                                                 onClick={() => handleDelete(item.email)}
                                             >
@@ -152,7 +153,7 @@ const StaffManagementPage = () => {
                 </section>
 
                 <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Thêm tài khoản nhân viên mới">
-                    <form onSubmit={handleAddStaff} className="flex flex-col gap-4">
+                    <form onSubmit={handleAddStaff} className={styles.form}>
                         <div className={styles.formGroup}>
                             <label className={styles.labelBold}>Họ và tên</label>
                             <input type="text" className={styles.inputField} value={newStaff.name} onChange={e => setNewStaff({...newStaff, name: e.target.value})} required />
@@ -161,7 +162,7 @@ const StaffManagementPage = () => {
                             <label className={styles.labelBold}>Email (Dùng để đăng nhập)</label>
                             <input type="email" className={styles.inputField} value={newStaff.email} onChange={e => setNewStaff({...newStaff, email: e.target.value})} required />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className={styles.formGrid2}>
                             <div className={styles.formGroup}>
                                 <label className={styles.labelBold}>Mật khẩu ban đầu</label>
                                 <input type="text" className={styles.inputField} value={newStaff.password} onChange={e => setNewStaff({...newStaff, password: e.target.value})} required />
@@ -174,7 +175,7 @@ const StaffManagementPage = () => {
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" className={styles.btnPrimary} style={{ width: '100%', marginTop: '1rem', padding: '1rem' }}>Tạo tài khoản</button>
+                        <button type="submit" className={clsx(styles.btnPrimary, styles.btnFull)}>Tạo tài khoản</button>
                     </form>
                 </Modal>
             </div>

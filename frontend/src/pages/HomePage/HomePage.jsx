@@ -69,12 +69,12 @@ const HomePage = () => {
             )}
 
             <section className={clsx(styles.productSection, searchQuery && styles.productSectionSearch)}>
-                <div className="max-w-7xl mx-auto px-6">
+                <div className={styles.container}>
                     <h2 className={styles.sectionTitle}>
                         {searchQuery ? `Kết quả cho "${searchQuery}"` : 'Sản Phẩm Bán Chạy'}
                     </h2>
                     {loading ? (
-                        <div className="text-center py-10">Đang tải sản phẩm...</div>
+                        <div className={styles.loading}>Đang tải sản phẩm...</div>
                     ) : filteredProducts.length > 0 ? (
                         <div className={styles.grid}>
                             {filteredProducts.map(product => (
@@ -82,7 +82,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-20 text-gray-500">
+                        <div className={styles.empty}>
                             Không tìm thấy sản phẩm nào phù hợp.
                         </div>
                     )}

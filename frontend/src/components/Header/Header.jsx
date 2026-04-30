@@ -60,15 +60,15 @@ const Header = () => {
 
                     {isAuthenticated ? (
                         <div className={styles.userMenu}>
-                            <User className="w-5 h-5 text-gray-600" />
+                            <User className={styles.userIconSmall} />
                             <span className={styles.userName}>{user.name}</span>
                             <button onClick={logout} className={styles.logoutBtn}>
-                                <LogOut className="w-4 h-4" />
+                                <LogOut className={styles.logoutIcon} />
                             </button>
                         </div>
                     ) : (
-                        <Link to="/login" className="p-2 text-gray-600 hover:text-blue-600">
-                            <User className="w-6 h-6" />
+                        <Link to="/login" className={styles.loginLink}>
+                            <User className={styles.userIconLarge} />
                         </Link>
                     )}
                 </div>

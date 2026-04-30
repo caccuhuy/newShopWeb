@@ -126,5 +126,36 @@ export const apiService = {
         users[index] = { ...users[index], ...updateData };
         saveLocalData('mock_users', users);
         return users[index];
+    },
+
+    // Orders Management
+    getOrders: async () => {
+        await new Promise(r => setTimeout(r, 400));
+        return getLocalData('mock_orders', []);
+    },
+
+    updateOrderStatus: async (orderId, status) => {
+        await new Promise(r => setTimeout(r, 500));
+        const orders = getLocalData('mock_orders', []);
+        const index = orders.findIndex(o => o.id === orderId);
+        if (index === -1) throw new Error('Đơn hàng không tồn tại');
+        
+        orders[index].status = status;
+        saveLocalData('mock_orders', orders);
+        return orders[index];
+    },
+
+    // Activity Logs
+    addActivityLog: async (logData) => {
+        const logs = getLocalData('mock_logs', []);
+        const newLog = { ...logData, id: Date.now(), timestamp: new Date() };
+        logs.push(newLog);
+        saveLocalData('mock_logs', logs);
+        return newLog;
+    },
+
+    getActivityLogs: async () => {
+        await new Promise(r => setTimeout(r, 300));
+        return getLocalData('mock_logs', []);
     }
 };

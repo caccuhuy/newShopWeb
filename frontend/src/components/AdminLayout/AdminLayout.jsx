@@ -1,4 +1,3 @@
-import React from 'react';
 import AdminSidebar from '../AdminSidebar/AdminSidebar';
 import styles from './AdminLayout.module.css';
 

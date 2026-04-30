@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import Modal from '../../components/Modal/Modal';
@@ -12,9 +12,18 @@ const StaffManagementPage = () => {
     const { isAdmin, user: currentUser } = useAuth();
     const navigate = useNavigate();
     const [staffList, setStaffList] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [newStaff, setNewStaff] = useState({ name: '', email: '', password: 'password123', role: 'staff' });
+
+    const loadStaff = useCallback(async () => {
+        try {
+            const users = await apiService.getUsers();
+            const filtered = users.filter(u => u.role === 'staff' || u.role === 'admin');
+            setStaffList(filtered);
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
 
     useEffect(() => {
         if (!isAdmin) {
@@ -22,19 +31,7 @@ const StaffManagementPage = () => {
             return;
         }
         loadStaff();
-    }, [isAdmin, navigate]);
-
-    const loadStaff = async () => {
-        try {
-            const users = await apiService.getUsers();
-            const filtered = users.filter(u => u.role === 'staff' || u.role === 'admin');
-            setStaffList(filtered);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [isAdmin, navigate, loadStaff]);
 
     const handleDelete = async (email) => {
         if (email === currentUser.email) {

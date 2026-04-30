@@ -134,6 +134,19 @@ export const apiService = {
         return getLocalData('mock_orders', []);
     },
 
+    createOrder: async (orderData) => {
+        await new Promise(r => setTimeout(r, 500));
+        const orders = getLocalData('mock_orders', []);
+        const newOrder = {
+            ...orderData,
+            id: Date.now(),
+            status: 'pending'
+        };
+        orders.push(newOrder);
+        saveLocalData('mock_orders', orders);
+        return newOrder;
+    },
+
     updateOrderStatus: async (orderId, status) => {
         await new Promise(r => setTimeout(r, 500));
         const orders = getLocalData('mock_orders', []);

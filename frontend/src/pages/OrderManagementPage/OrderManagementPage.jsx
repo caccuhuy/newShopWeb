@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import { apiService } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
@@ -9,22 +9,19 @@ import { clsx } from 'clsx';
 const OrderManagementPage = () => {
     const { isStaff, isAdmin, user } = useAuth();
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadOrders();
-    }, []);
-
-    const loadOrders = async () => {
+    const loadOrders = useCallback(async () => {
         try {
             const data = await apiService.getOrders();
             setOrders(data.sort((a, b) => b.id - a.id));
         } catch (error) {
             console.error(error);
-        } finally {
-            setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        loadOrders();
+    }, [loadOrders]);
 
     const handleUpdateStatus = async (orderId, newStatus) => {
         const actionText = newStatus === 'shipping' ? 'xác nhận giao' : (newStatus === 'completed' ? 'hoàn thành' : 'hủy');

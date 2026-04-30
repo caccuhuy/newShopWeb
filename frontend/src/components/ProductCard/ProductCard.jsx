@@ -1,6 +1,4 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import styles from './ProductCard.module.css';
 

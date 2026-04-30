@@ -217,7 +217,7 @@
 .chartLegend {
     display: flex;
     justify-content: space-between;
-    mt-4;
+    margin-top: 1rem;
     font-size: 10px;
     font-weight: 700;
     color: #d1d5db;

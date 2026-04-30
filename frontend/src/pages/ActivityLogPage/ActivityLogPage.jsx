@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import { apiService } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
@@ -9,22 +9,18 @@ import { clsx } from 'clsx';
 const ActivityLogPage = () => {
     const { isAdmin } = useAuth();
     const [logs, setLogs] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadLogs();
-    }, []);
-
-    const loadLogs = async () => {
-        try {
+        let isMounted = true;
+        const fetchData = async () => {
             const data = await apiService.getActivityLogs();
-            setLogs(data.sort((a, b) => b.id - a.id));
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+            if (isMounted) {
+                setLogs(data.sort((a, b) => b.id - a.id));
+            }
+        };
+        fetchData();
+        return () => { isMounted = false; };
+    }, []);
 
     if (!isAdmin) return null;
 

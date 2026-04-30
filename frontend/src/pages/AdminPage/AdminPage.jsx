@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout/AdminLayout';
 import Modal from '../../components/Modal/Modal';
 import { apiService } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
-import { Download, Plus, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import styles from './AdminPage.module.css';
 import { clsx } from 'clsx';
 
@@ -13,19 +13,10 @@ const AdminPage = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [newProduct, setNewProduct] = useState({
         name: '', brand: '', price: '', stock_quantity: 20, image_url: 'https://via.placeholder.com/150'
     });
-
-    useEffect(() => {
-        if (!isStaff) {
-            navigate('/login');
-            return;
-        }
-        fetchProducts();
-    }, [isStaff, navigate]);
 
     const fetchProducts = async () => {
         try {
@@ -33,10 +24,25 @@ const AdminPage = () => {
             setProducts(data);
         } catch (error) {
             console.error(error);
-        } finally {
-            setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (!isStaff) {
+            navigate('/login');
+            return;
+        }
+
+        let isMounted = true;
+        const fetchData = async () => {
+            const data = await apiService.getProducts();
+            if (isMounted) {
+                setProducts(data);
+            }
+        };
+        fetchData();
+        return () => { isMounted = false; };
+    }, [isStaff, navigate]);
 
     const handleUpdateStock = async (id, type) => {
         const action = type === 'import' ? 'NHẬP THÊM' : 'XUẤT KHO';

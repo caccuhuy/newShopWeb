@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import ProductCard from '../../components/ProductCard/ProductCard';
@@ -8,7 +8,6 @@ import { clsx } from 'clsx';
 
 const HomePage = () => {
     const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get('search') || '';
@@ -18,7 +17,6 @@ const HomePage = () => {
             try {
                 const data = await apiService.getProducts();
                 setProducts(data);
-                setFilteredProducts(data);
             } catch (error) {
                 console.error('Error fetching products:', error);
             } finally {
@@ -28,17 +26,10 @@ const HomePage = () => {
         fetchProducts();
     }, []);
 
-    useEffect(() => {
-        if (searchQuery) {
-            const filtered = products.filter(p => 
-                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.brand.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredProducts(filtered);
-        } else {
-            setFilteredProducts(products);
-        }
-    }, [searchQuery, products]);
+    const filteredProducts = products.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.brand.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className={styles.wrapper}>

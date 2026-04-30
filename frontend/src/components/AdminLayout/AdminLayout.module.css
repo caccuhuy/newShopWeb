@@ -1,0 +1,12 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fc;
+}
+
+.main {
+    flex: 1;
+    margin-left: 16rem; /* Khớp với chiều rộng Sidebar */
+    padding: 2.5rem;
+    min-height: 100vh;
+}

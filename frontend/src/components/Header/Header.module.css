@@ -1,0 +1,154 @@
+.header {
+    position: fixed;
+    width: 100%;
+    z-index: 50;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3451B2;
+    letter-spacing: -0.025em;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .nav {
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+    }
+}
+
+.navLink {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.navLink:hover {
+    color: #000;
+}
+
+.active {
+    color: #3451B2;
+    border-bottom: 2px solid #3451B2;
+    padding-bottom: 0.25rem;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.searchWrapper {
+    position: relative;
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .searchWrapper {
+        display: block;
+    }
+}
+
+.searchInput {
+    background-color: #f3f4f6;
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem 0.5rem 2.5rem;
+    font-size: 0.75rem;
+    width: 16rem;
+    border: none;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.searchInput:focus {
+    box-shadow: 0 0 0 2px rgba(52, 81, 178, 0.1);
+}
+
+.searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    color: #9ca3af;
+}
+
+.cartBtn {
+    position: relative;
+    padding: 0.5rem;
+    color: #374151;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.cartBtn:hover {
+    color: #3451B2;
+}
+
+.cartIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.badge {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    background-color: #ef4444;
+    color: white;
+    font-size: 10px;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+}
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.userName {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.logoutBtn {
+    font-size: 0.75rem;
+    color: #ef4444;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}

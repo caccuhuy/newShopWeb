@@ -3,24 +3,48 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/customer/HomePage/HomePage';
 import ProductDetailPage from '../pages/customer/ProductDetailPage/ProductDetailPage';
 import CheckoutPage from '../pages/customer/CheckoutPage/CheckoutPage';
-import LoginPage from '../pages/auth/LoginPage/LoginPage';
+import CustomerLogin from '../pages/auth/CustomerLogin/CustomerLogin';
+import AdminLogin from '../pages/auth/AdminLogin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard/AdminDashboard';
 import StaffManagementPage from '../pages/admin/StaffManagementPage/StaffManagementPage';
 import OrderManagementPage from '../pages/admin/OrderManagementPage/OrderManagementPage';
 import ActivityLogPage from '../pages/admin/ActivityLogPage/ActivityLogPage';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 function AppRoutes() {
   return (
     <Router>
       <Routes>
+        {/* Customer Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CheckoutPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/staff" element={<StaffManagementPage />} />
-        <Route path="/admin/orders" element={<OrderManagementPage />} />
-        <Route path="/admin/logs" element={<ActivityLogPage />} />
+        <Route path="/login" element={<CustomerLogin />} />
+        
+        {/* Admin/Staff Auth */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* Protected Admin Routes */}
+        <Route path="/admin" element={
+            <ProtectedRoute>
+                <AdminDashboard />
+            </ProtectedRoute>
+        } />
+        <Route path="/admin/staff" element={
+            <ProtectedRoute requireAdmin={true}>
+                <StaffManagementPage />
+            </ProtectedRoute>
+        } />
+        <Route path="/admin/orders" element={
+            <ProtectedRoute>
+                <OrderManagementPage />
+            </ProtectedRoute>
+        } />
+        <Route path="/admin/logs" element={
+            <ProtectedRoute requireAdmin={true}>
+                <ActivityLogPage />
+            </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );

@@ -29,34 +29,41 @@ if (!localStorage.getItem('mock_users')) {
 export const apiService = {
     // Auth
     login: async (email, password, isStaff = false) => {
-        await new Promise(r => setTimeout(r, 500));
-        const users = getLocalData('mock_users', DEFAULT_USERS);
-        const user = users.find(u => u.email === email && u.password === password);
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
         
-        if (!user) throw new Error('Email hoặc mật khẩu không chính xác!');
-        
-        if (isStaff && user.role === 'customer') {
-            throw new Error('Bạn không có quyền truy cập vào Portal Nhân Viên!');
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Lỗi đăng nhập');
         }
-        if (!isStaff && user.role !== 'customer') {
-             throw new Error('Tài khoản này không có quyền truy cập khu vực khách hàng!');
+        
+        const userRole = data.user.role;
+        if (isStaff && userRole === 'Customer') {
+            throw new Error('Tài khoản sai mật khẩu hoặc không tồn tại');
+        }
+        if (!isStaff && userRole !== 'Customer') {
+            throw new Error('Tài khoản sai mật khẩu hoặc không tồn tại');
         }
 
-        return { 
-            token: 'mock-jwt-' + (isStaff ? 'staff-' : 'customer-') + Math.random(), 
-            user: { name: user.name, email: user.email, role: user.role } 
-        };
+        return data;
     },
 
     register: async (userData) => {
-        await new Promise(r => setTimeout(r, 500));
-        const users = getLocalData('mock_users', DEFAULT_USERS);
-        if (users.find(u => u.email === userData.email)) throw new Error('Email này đã được đăng ký!');
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
         
-        const newUser = { ...userData, role: 'customer' };
-        users.push(newUser);
-        saveLocalData('mock_users', users);
-        return { message: 'Đăng ký thành công!' };
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Lỗi đăng ký');
+        }
+        
+        return data;
     },
 
     // Products

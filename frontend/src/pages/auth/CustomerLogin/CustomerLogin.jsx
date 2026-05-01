@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import styles from './LoginPage.module.css';
+import styles from './CustomerLogin.module.css';
 import { clsx } from 'clsx';
 
-const LoginPage = () => {
+const CustomerLogin = () => {
     const [mode, setMode] = useState('login'); // 'login' or 'register'
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
-    const [isStaffMode, setIsStaffMode] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [address, setAddress] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
@@ -25,12 +26,17 @@ const LoginPage = () => {
         
         try {
             if (mode === 'login') {
-                await login(email, password, isStaffMode);
-                navigate(isStaffMode ? '/admin' : '/');
+                const loggedInUser = await login(email, password, false);
+                if (loggedInUser.role === 'Staff' || loggedInUser.role === 'Admin') {
+                    // Logic is handled in apiService to throw error if not Customer
+                }
+                navigate('/');
             } else {
-                await register({ name, email, password });
+                await register({ name, email, password, phone_number: phoneNumber, address });
                 setSuccess('Đăng ký thành công! Hãy đăng nhập.');
                 setMode('login');
+                setPhoneNumber('');
+                setAddress('');
             }
         } catch (err) {
             setError(err.message);
@@ -43,12 +49,12 @@ const LoginPage = () => {
         <div className={styles.container}>
             <div className={styles.card}>
                 <h1 className={styles.title}>
-                    {mode === 'register' ? 'Đăng ký tài khoản' : (isStaffMode ? 'Staff Portal' : 'Chào mừng trở lại')}
+                    {mode === 'register' ? 'Đăng ký tài khoản' : 'Chào mừng trở lại'}
                 </h1>
                 <p className={styles.subtitle}>
                     {mode === 'register' 
                         ? 'Tham gia cùng cộng đồng mua sắm ArchitectLedger' 
-                        : (isStaffMode ? 'Đăng nhập dành cho nhân viên' : 'Đăng nhập vào tài khoản khách hàng của bạn')}
+                        : 'Đăng nhập vào tài khoản khách hàng của bạn'}
                 </p>
                 
                 {error && <div className={styles.error}>{error}</div>}
@@ -56,17 +62,41 @@ const LoginPage = () => {
                 
                 <form className={styles.form} onSubmit={handleSubmit}>
                     {mode === 'register' && (
-                        <div className={styles.field}>
-                            <label className={styles.label}>Họ và tên</label>
-                            <input 
-                                type="text" 
-                                className={styles.input} 
-                                placeholder="Nguyễn Văn A"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required 
-                            />
-                        </div>
+                        <>
+                            <div className={styles.field}>
+                                <label className={styles.label}>Họ và tên</label>
+                                <input 
+                                    type="text" 
+                                    className={styles.input} 
+                                    placeholder="Nguyễn Văn A"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required 
+                                />
+                            </div>
+                            <div className={styles.field}>
+                                <label className={styles.label}>Số điện thoại</label>
+                                <input 
+                                    type="tel" 
+                                    className={styles.input} 
+                                    placeholder="0912345678"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    required 
+                                />
+                            </div>
+                            <div className={styles.field}>
+                                <label className={styles.label}>Địa chỉ</label>
+                                <input 
+                                    type="text" 
+                                    className={styles.input} 
+                                    placeholder="Số nhà, Đường, Phường/Xã, Quận/Huyện..."
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    required 
+                                />
+                            </div>
+                        </>
                     )}
                     
                     <div className={styles.field}>
@@ -100,30 +130,12 @@ const LoginPage = () => {
                 
                 <div className={styles.footer}>
                     {mode === 'login' ? (
-                        <>
-                            <p>
-                                Chưa có tài khoản?{' '}
-                                <button onClick={() => setMode('register')} className={clsx(styles.link, styles.textLink)}>
-                                    Đăng ký ngay
-                                </button>
-                            </p>
-                            {!isStaffMode && (
-                                <p className={styles.footerText}>
-                                    Bạn là nhân viên?{' '}
-                                    <button onClick={() => setIsStaffMode(true)} className={clsx(styles.link, styles.textLink)}>
-                                        Truy cập Portal
-                                    </button>
-                                </p>
-                            )}
-                            {isStaffMode && (
-                                <p className={styles.footerText}>
-                                    Quay lại trang khách?{' '}
-                                    <button onClick={() => setIsStaffMode(false)} className={clsx(styles.link, styles.textLink)}>
-                                        Đăng nhập khách
-                                    </button>
-                                </p>
-                            )}
-                        </>
+                        <p>
+                            Chưa có tài khoản?{' '}
+                            <button onClick={() => setMode('register')} className={clsx(styles.link, styles.textLink)}>
+                                Đăng ký ngay
+                            </button>
+                        </p>
                     ) : (
                         <p>
                             Đã có tài khoản?{' '}
@@ -141,4 +153,4 @@ const LoginPage = () => {
     );
 };
 
-export default LoginPage;
+export default CustomerLogin;

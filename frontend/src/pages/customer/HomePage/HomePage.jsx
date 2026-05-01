@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Header from '../../components/Header/Header';
-import ProductCard from '../../components/ProductCard/ProductCard';
-import { apiService } from '../../services/apiService';
+import Header from '../../../components/common/Header/Header';
+import ProductCard from '../../../components/customer/ProductCard/ProductCard';
+import { apiService } from '../../../services/apiService';
 import styles from './HomePage.module.css';
 import { clsx } from 'clsx';
 

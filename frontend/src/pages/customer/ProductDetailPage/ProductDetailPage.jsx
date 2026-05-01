@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../../components/Header/Header';
-import { apiService } from '../../services/apiService';
-import { useCart } from '../../context/CartContext';
+import Header from '../../../components/common/Header/Header';
+import { apiService } from '../../../services/apiService';
+import { useCart } from '../../../context/CartContext';
 import styles from './ProductDetailPage.module.css';
 
 const ProductDetailPage = () => {

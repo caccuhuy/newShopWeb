@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import AdminLayout from '../../components/AdminLayout/AdminLayout';
-import { apiService } from '../../services/apiService';
-import { useAuth } from '../../context/AuthContext';
+import AdminLayout from '../../../layouts/AdminLayout/AdminLayout';
+import { apiService } from '../../../services/apiService';
+import { useAuth } from '../../../context/AuthContext';
 import { History, User } from 'lucide-react';
-import styles from '../AdminPage/AdminPage.module.css';
+import styles from "./ActivityLogPage.module.css";
 import { clsx } from 'clsx';
 
 const ActivityLogPage = () => {

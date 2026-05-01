@@ -1,4 +1,4 @@
-import { MOCK_PRODUCTS } from '../data/products';
+import { MOCK_PRODUCTS } from '../mocks/products';
 
 // Helper to get from localStorage or default
 const getLocalData = (key, defaultData) => {

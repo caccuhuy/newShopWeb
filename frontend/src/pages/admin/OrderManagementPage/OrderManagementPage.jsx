@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import AdminLayout from '../../components/AdminLayout/AdminLayout';
-import { apiService } from '../../services/apiService';
-import { useAuth } from '../../context/AuthContext';
+import AdminLayout from '../../../layouts/AdminLayout/AdminLayout';
+import { apiService } from '../../../services/apiService';
+import { useAuth } from '../../../context/AuthContext';
 import { CheckCircle, XCircle, Clock, Truck, Eye } from 'lucide-react';
-import styles from '../AdminPage/AdminPage.module.css';
+import styles from "./OrderManagementPage.module.css";
 import { clsx } from 'clsx';
 
 const OrderManagementPage = () => {

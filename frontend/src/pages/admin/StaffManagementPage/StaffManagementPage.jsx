@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminLayout from '../../components/AdminLayout/AdminLayout';
-import Modal from '../../components/Modal/Modal';
-import { apiService } from '../../services/apiService';
-import { useAuth } from '../../context/AuthContext';
+import AdminLayout from '../../../layouts/AdminLayout/AdminLayout';
+import Modal from '../../../components/common/Modal/Modal';
+import { apiService } from '../../../services/apiService';
+import { useAuth } from '../../../context/AuthContext';
 import { UserPlus, Trash2, RotateCcw, ShieldCheck, UserCog } from 'lucide-react';
-import styles from '../AdminPage/AdminPage.module.css';
+import styles from "./StaffManagementPage.module.css";
 import { clsx } from 'clsx';
 
 const StaffManagementPage = () => {

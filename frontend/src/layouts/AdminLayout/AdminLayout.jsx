@@ -1,4 +1,4 @@
-import AdminSidebar from '../AdminSidebar/AdminSidebar';
+import AdminSidebar from '../../components/admin/AdminSidebar/AdminSidebar';
 import styles from './AdminLayout.module.css';
 
 const AdminLayout = ({ children }) => {

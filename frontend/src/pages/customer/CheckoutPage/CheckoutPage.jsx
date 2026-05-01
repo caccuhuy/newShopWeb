@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Header from '../../components/Header/Header';
-import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
-import { apiService } from '../../services/apiService';
+import Header from '../../../components/common/Header/Header';
+import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../context/AuthContext';
+import { apiService } from '../../../services/apiService';
 import styles from './CheckoutPage.module.css';
 
 const CheckoutPage = () => {

@@ -50,6 +50,7 @@ newShopWeb/
 - Cài đặt dependencies: `npm install`
 - Chạy ứng dụng: `npm run dev`
 - Truy cập tại: `http://localhost:5173`
+- Trang đăng nhập Admin/Staff: `http://localhost:5173/admin/login`
 
 ## 🔑 Tài khoản thử nghiệm
 

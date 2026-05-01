@@ -30,11 +30,11 @@ router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
         // 2. Revenue Chart Data (last X days)
         const chartQuery = `
             SELECT 
-                FORMAT(created_at, 'dd/MM') as date,
+                SUBSTRING(CONVERT(VARCHAR, created_at, 103), 1, 5) as date,
                 ISNULL(SUM(total_amount), 0) as revenue
             FROM Orders
             WHERE status = 'completed' AND created_at >= DATEADD(day, -@days, GETDATE())
-            GROUP BY FORMAT(created_at, 'dd/MM'), CAST(created_at AS DATE)
+            GROUP BY SUBSTRING(CONVERT(VARCHAR, created_at, 103), 1, 5), CAST(created_at AS DATE)
             ORDER BY CAST(created_at AS DATE)
         `;
 

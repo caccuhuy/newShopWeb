@@ -31,17 +31,17 @@ const AdminSidebar = () => {
                         <NavLink to="/admin/staff" className={({ isActive }) => isActive ? `${styles.navBtn} ${styles.activeBtn}` : styles.navBtn}>
                             <Users size={18} /> <span>Quản lý nhân viên</span>
                         </NavLink>
+                        <NavLink to="/admin/products" className={({ isActive }) => isActive ? `${styles.navBtn} ${styles.activeBtn}` : styles.navBtn}>
+                            <Package size={18} /> <span>Quản lý sản phẩm</span>
+                        </NavLink>
+                        <NavLink to="/admin/suppliers" className={({ isActive }) => isActive ? `${styles.navBtn} ${styles.activeBtn}` : styles.navBtn}>
+                            <FolderOpen size={18} /> <span>Nhà cung cấp</span>
+                        </NavLink>
                         <NavLink to="/admin/logs" className={({ isActive }) => isActive ? `${styles.navBtn} ${styles.activeBtn}` : styles.navBtn}>
                             <History size={18} /> <span>Nhật ký</span>
                         </NavLink>
                     </>
                 )}
-                <button className={styles.navBtn}>
-                    <FolderOpen size={18} /> <span>Suppliers</span>
-                </button>
-                <button className={styles.navBtn}>
-                    <Package size={18} /> <span>Stock</span>
-                </button>
             </nav>
 
             <div className={styles.footer}>

@@ -9,6 +9,8 @@ import AdminDashboard from '../pages/admin/AdminDashboard/AdminDashboard';
 import StaffManagementPage from '../pages/admin/StaffManagementPage/StaffManagementPage';
 import OrderManagementPage from '../pages/admin/OrderManagementPage/OrderManagementPage';
 import ActivityLogPage from '../pages/admin/ActivityLogPage/ActivityLogPage';
+import ProductManagementPage from '../pages/admin/ProductManagementPage/ProductManagementPage';
+import SupplierManagementPage from '../pages/admin/SupplierManagementPage/SupplierManagementPage';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 function AppRoutes() {
@@ -43,6 +45,16 @@ function AppRoutes() {
         <Route path="/admin/logs" element={
             <ProtectedRoute requireAdmin={true}>
                 <ActivityLogPage />
+            </ProtectedRoute>
+        } />
+        <Route path="/admin/products" element={
+            <ProtectedRoute requireAdmin={true}>
+                <ProductManagementPage />
+            </ProtectedRoute>
+        } />
+        <Route path="/admin/suppliers" element={
+            <ProtectedRoute requireAdmin={true}>
+                <SupplierManagementPage />
             </ProtectedRoute>
         } />
       </Routes>

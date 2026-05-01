@@ -13,10 +13,12 @@ app.use(express.json());
 const productRoutes = require('./routes/products');
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/orders');
+const staffRoutes = require('./routes/staff');
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/staff', staffRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

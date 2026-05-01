@@ -4,12 +4,14 @@ import Header from '../../../components/common/Header/Header';
 import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
 import { apiService } from '../../../services/apiService';
+import AlertModal from '../../../components/common/Modal/AlertModal';
 import styles from './CheckoutPage.module.css';
 
 const CheckoutPage = () => {
     const { cart, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
     
     const [formData, setFormData] = useState({
         name: user?.name || '',
@@ -35,13 +37,29 @@ const CheckoutPage = () => {
                 shipping_address: formData.address,
                 customer_info: formData
             });
-            alert('Đặt hàng thành công!');
+            setAlertConfig({
+                isOpen: true,
+                type: 'success',
+                title: 'Đặt hàng thành công',
+                message: 'Đơn hàng của bạn đã được ghi nhận. Chúng tôi sẽ liên hệ sớm nhất!'
+            });
             clearCart();
-            navigate('/');
         } catch (error) {
-            alert('Lỗi đặt hàng: ' + error.message);
+            setAlertConfig({
+                isOpen: true,
+                type: 'error',
+                title: 'Lỗi đặt hàng',
+                message: error.message
+            });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCloseAlert = () => {
+        setAlertConfig({ ...alertConfig, isOpen: false });
+        if (alertConfig.type === 'success') {
+            navigate('/');
         }
     };
 
@@ -141,6 +159,14 @@ const CheckoutPage = () => {
                     </div>
                 )}
             </main>
+
+            <AlertModal 
+                isOpen={alertConfig.isOpen}
+                onClose={handleCloseAlert}
+                type={alertConfig.type}
+                title={alertConfig.title}
+                message={alertConfig.message}
+            />
         </div>
     );
 };

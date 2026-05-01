@@ -84,7 +84,7 @@ Hệ thống quản lý thông qua các thực thể cốt lõi sau:
 | Tên chức năng | Mô tả |
 |---|---|
 | **Quản lý nhân sự** | Thêm, sửa, xóa, khóa tài khoản nhân viên. Thiết lập mật khẩu mặc định cho người mới. |
-| **Theo dõi báo cáo** | Xem bảng thống kê doanh thu, tồn kho, và hiệu suất làm việc của nhân viên (kết xuất JSON sang biểu đồ). |
+| **Theo dõi báo cáo** | Xem bảng thống kê doanh thu, tồn kho(kết xuất JSON sang biểu đồ). |
 | **Cấu hình hệ thống** | Quản lý nhà cung cấp, loại sản phẩm, thương hiệu (kèm chức năng tự kiểm tra ràng buộc trước khi xóa). |
 
 ---

@@ -32,6 +32,11 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Tài khoản sai mật khẩu hoặc không tồn tại' });
         }
 
+        // Check if account is active
+        if (user.is_active === false) {
+            return res.status(403).json({ message: 'Tài khoản của bạn đã bị vô hiệu hóa, vui lòng liên hệ Quản trị viên' });
+        }
+
         // Generate JWT token
         const payload = { 
             id: user.user_id, 

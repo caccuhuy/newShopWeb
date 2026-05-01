@@ -110,29 +110,56 @@ export const apiService = {
         return products[index].stock_quantity;
     },
 
+    // Helper for auth headers
+    getAuthHeaders: () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+    },
+
     // Users Management (Admin only)
-    getUsers: async () => {
-        await new Promise(r => setTimeout(r, 300));
-        return getLocalData('mock_users', DEFAULT_USERS);
+    getStaffList: async () => {
+        const response = await fetch('http://localhost:5000/api/staff', {
+            headers: apiService.getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Lỗi lấy danh sách nhân viên');
+        return data;
     },
 
-    deleteUser: async (email) => {
-        await new Promise(r => setTimeout(r, 500));
-        let users = getLocalData('mock_users', DEFAULT_USERS);
-        users = users.filter(u => u.email !== email);
-        saveLocalData('mock_users', users);
-        return { message: 'Xóa thành công' };
+    createStaff: async (staffData) => {
+        const response = await fetch('http://localhost:5000/api/staff', {
+            method: 'POST',
+            headers: apiService.getAuthHeaders(),
+            body: JSON.stringify(staffData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Lỗi thêm nhân viên');
+        return data;
     },
 
-    updateUser: async (email, updateData) => {
-        await new Promise(r => setTimeout(r, 500));
-        const users = getLocalData('mock_users', DEFAULT_USERS);
-        const index = users.findIndex(u => u.email === email);
-        if (index === -1) throw new Error('Người dùng không tồn tại');
-        
-        users[index] = { ...users[index], ...updateData };
-        saveLocalData('mock_users', users);
-        return users[index];
+    updateStaffStatus: async (userId, isActive) => {
+        const response = await fetch(`http://localhost:5000/api/staff/${userId}/status`, {
+            method: 'PUT',
+            headers: apiService.getAuthHeaders(),
+            body: JSON.stringify({ is_active: isActive })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Lỗi cập nhật trạng thái');
+        return data;
+    },
+
+    resetStaffPassword: async (userId, newPassword) => {
+        const response = await fetch(`http://localhost:5000/api/staff/${userId}/reset-password`, {
+            method: 'PUT',
+            headers: apiService.getAuthHeaders(),
+            body: JSON.stringify({ password: newPassword })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Lỗi reset mật khẩu');
+        return data;
     },
 
     // Orders Management

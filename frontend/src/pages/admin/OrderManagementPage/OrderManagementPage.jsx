@@ -3,12 +3,16 @@ import AdminLayout from '../../../layouts/AdminLayout/AdminLayout';
 import { apiService } from '../../../services/apiService';
 import { useAuth } from '../../../context/AuthContext';
 import { CheckCircle, XCircle, Clock, Truck, Eye } from 'lucide-react';
+import Modal from '../../../components/common/Modal/Modal';
+import AlertModal from '../../../components/common/Modal/AlertModal';
 import styles from "./OrderManagementPage.module.css";
 import { clsx } from 'clsx';
 
 const OrderManagementPage = () => {
     const { isStaff, isAdmin, user } = useAuth();
     const [orders, setOrders] = useState([]);
+    
+    const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
 
     const loadOrders = useCallback(async () => {
         try {
@@ -37,9 +41,19 @@ const OrderManagementPage = () => {
             });
 
             loadOrders();
-            alert(`Đã ${actionText} đơn hàng thành công!`);
+            setAlertConfig({
+                isOpen: true,
+                type: 'success',
+                title: 'Thành công',
+                message: `Đã ${actionText} đơn hàng thành công!`
+            });
         } catch (error) {
-            alert(error.message);
+            setAlertConfig({
+                isOpen: true,
+                type: 'error',
+                title: 'Lỗi',
+                message: error.message
+            });
         }
     };
 
@@ -146,6 +160,14 @@ const OrderManagementPage = () => {
                         </tbody>
                     </table>
                 </section>
+
+                <AlertModal 
+                    isOpen={alertConfig.isOpen}
+                    onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+                    type={alertConfig.type}
+                    title={alertConfig.title}
+                    message={alertConfig.message}
+                />
             </div>
         </AdminLayout>
     );

@@ -4,7 +4,9 @@ import AdminLayout from '../../../layouts/AdminLayout/AdminLayout';
 import Modal from '../../../components/common/Modal/Modal';
 import { apiService } from '../../../services/apiService';
 import { useAuth } from '../../../context/AuthContext';
-import { Bell } from 'lucide-react';
+import { Bell, TrendingUp, TrendingDown, Package, CheckCircle, AlertCircle } from 'lucide-react';
+import Modal from '../../../components/common/Modal/Modal';
+import AlertModal from '../../../components/common/Modal/AlertModal';
 import styles from "./AdminDashboard.module.css";
 import { clsx } from 'clsx';
 
@@ -13,7 +15,14 @@ const AdminPage = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    
+    const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
     const [showModal, setShowModal] = useState(false);
+    const [showStockModal, setShowStockModal] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [stockQuantity, setStockQuantity] = useState(10);
+    const [stockType, setStockType] = useState('import');
+
     const [newProduct, setNewProduct] = useState({
         name: '', brand: '', price: '', stock_quantity: 20, image_url: 'https://via.placeholder.com/150'
     });
@@ -44,18 +53,34 @@ const AdminPage = () => {
         return () => { isMounted = false; };
     }, [isStaff, navigate]);
 
-    const handleUpdateStock = async (id, type) => {
-        const action = type === 'import' ? 'NHẬP THÊM' : 'XUẤT KHO';
-        const quantity = prompt(`Nhập số lượng muốn ${action}:`, "10");
-        
-        if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0) return;
+    const handleUpdateStock = (product, type) => {
+        setSelectedProduct(product);
+        setStockType(type);
+        setStockQuantity(10);
+        setShowStockModal(true);
+    };
+
+    const confirmUpdateStock = async (e) => {
+        e.preventDefault();
+        const action = stockType === 'import' ? 'NHẬP THÊM' : 'XUẤT KHO';
 
         try {
-            const newStock = await apiService.updateStock(id, type, parseInt(quantity));
-            setProducts(products.map(p => p.id === id ? { ...p, stock_quantity: newStock } : p));
-            alert(`${action} thành công!`);
+            const newStock = await apiService.updateStock(selectedProduct.id, stockType, parseInt(stockQuantity));
+            setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, stock_quantity: newStock } : p));
+            setShowStockModal(false);
+            setAlertConfig({
+                isOpen: true,
+                type: 'success',
+                title: 'Thành công',
+                message: `${action} thành công!`
+            });
         } catch (error) {
-            alert(error.message);
+            setAlertConfig({
+                isOpen: true,
+                type: 'error',
+                title: 'Lỗi',
+                message: error.message
+            });
         }
     };
 
@@ -70,9 +95,19 @@ const AdminPage = () => {
             });
             setShowModal(false);
             fetchProducts();
-            alert('Đã tạo phiếu nhập hàng và thêm sản phẩm mới thành công!');
+            setAlertConfig({
+                isOpen: true,
+                type: 'success',
+                title: 'Thành công',
+                message: 'Đã tạo phiếu nhập hàng và thêm sản phẩm mới thành công!'
+            });
         } catch (error) {
-            alert(error.message);
+            setAlertConfig({
+                isOpen: true,
+                type: 'error',
+                title: 'Lỗi',
+                message: error.message
+            });
         }
     };
 
@@ -216,8 +251,8 @@ const AdminPage = () => {
                                     </td>
                                     <td className={styles.td}>
                                         <div className={styles.rowActions}>
-                                            <button className={clsx(styles.miniBtn, styles.btnImport)} onClick={() => handleUpdateStock(product.id, 'import')}>Nhập</button>
-                                            <button className={clsx(styles.miniBtn, styles.btnExportMini)} onClick={() => handleUpdateStock(product.id, 'export')}>Xuất</button>
+                                            <button className={clsx(styles.miniBtn, styles.btnImport)} onClick={() => handleUpdateStock(product, 'import')}>Nhập</button>
+                                            <button className={clsx(styles.miniBtn, styles.btnExportMini)} onClick={() => handleUpdateStock(product, 'export')}>Xuất</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -249,6 +284,53 @@ const AdminPage = () => {
                         <button type="submit" className={clsx(styles.btnPrimary, styles.btnFull)}>Lưu và Nhập kho</button>
                     </form>
                 </Modal>
+
+                {/* Modal Cập nhật tồn kho (Nhập/Xuất) */}
+                <Modal
+                    isOpen={showStockModal}
+                    onClose={() => setShowStockModal(false)}
+                    title={stockType === 'import' ? "Nhập thêm hàng vào kho" : "Xuất hàng khỏi kho"}
+                    size="sm"
+                >
+                    <form onSubmit={confirmUpdateStock} className={styles.form}>
+                        <div className={styles.confirmContent} style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                            <div className={clsx(styles.iconCircle, stockType === 'import' ? styles.bgGreen : styles.bgOrange)} style={{ margin: '0 auto 1rem' }}>
+                                {stockType === 'import' ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
+                            </div>
+                            <h4 className={styles.textBold}>{selectedProduct?.name}</h4>
+                            <p className={styles.textXS} style={{ color: '#666' }}>Hiện có: {selectedProduct?.stock_quantity} sản phẩm</p>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.labelBold}>Số lượng muốn {stockType === 'import' ? 'nhập' : 'xuất'}</label>
+                            <div className="relative">
+                                <input 
+                                    type="number" 
+                                    className={styles.inputField} 
+                                    value={stockQuantity} 
+                                    onChange={e => setStockQuantity(e.target.value)} 
+                                    min="1"
+                                    required 
+                                    style={{ width: '100%', paddingLeft: '2.5rem' }}
+                                />
+                                <Package size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999' }} />
+                            </div>
+                        </div>
+
+                        <div className={styles.rowActions} style={{ marginTop: '1.5rem', justifyContent: 'flex-end', gap: '0.75rem', display: 'flex' }}>
+                            <button type="button" className={styles.btnExport} onClick={() => setShowStockModal(false)} style={{ margin: 0 }}>Hủy</button>
+                            <button type="submit" className={styles.btnPrimary}>Xác nhận {stockType === 'import' ? 'Nhập' : 'Xuất'}</button>
+                        </div>
+                    </form>
+                </Modal>
+
+                <AlertModal 
+                    isOpen={alertConfig.isOpen}
+                    onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+                    type={alertConfig.type}
+                    title={alertConfig.title}
+                    message={alertConfig.message}
+                />
             </div>
         </AdminLayout>
     );

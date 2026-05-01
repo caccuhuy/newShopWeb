@@ -13,6 +13,7 @@ const StaffManagementPage = () => {
     const { isAdmin, user: currentUser } = useAuth();
     const navigate = useNavigate();
     const [staffList, setStaffList] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
     const [showModal, setShowModal] = useState(false);
@@ -119,6 +120,11 @@ const StaffManagementPage = () => {
         }
     };
 
+    const filteredStaffList = staffList.filter(staff => 
+        staff.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        staff.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (!isAdmin) return null;
 
     return (
@@ -137,6 +143,15 @@ const StaffManagementPage = () => {
                 <section className={styles.inventorySection}>
                     <div className={styles.tableHeader}>
                         <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Danh sách tài khoản</h3>
+                        <div className={styles.searchWrapper}>
+                            <input 
+                                type="text" 
+                                placeholder="Tìm theo tên hoặc email..." 
+                                className={styles.searchInput}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
                     </div>
                     <table className={styles.table}>
                         <thead>
@@ -148,7 +163,7 @@ const StaffManagementPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {staffList.map(item => (
+                            {filteredStaffList.map(item => (
                                 <tr key={item.user_id}>
                                     <td className={styles.td}>
                                         <div className={styles.productInfo}>
@@ -156,7 +171,9 @@ const StaffManagementPage = () => {
                                                 {item.role_name === 'Admin' ? <ShieldCheck size={20} /> : <UserCog size={20} />}
                                             </div>
                                             <div>
-                                                <div className={clsx(styles.textBold, styles.textSmall)}>{item.username}</div>
+                                                <div className={clsx(styles.textBold, styles.textSmall)}>
+                                                    {item.username} {item.email === currentUser?.email && <span className={styles.selfBadge}>(Bạn)</span>}
+                                                </div>
                                                 <div className={clsx(styles.textXS, styles.textMuted, styles.textBlack)}>{item.email}</div>
                                             </div>
                                         </div>
@@ -180,13 +197,18 @@ const StaffManagementPage = () => {
                                             >
                                                 <RotateCcw size={12} />
                                             </button>
-                                            <button 
-                                                className={clsx(styles.miniBtn, item.is_active ? styles.btnDelete : styles.btnUnlock)} 
-                                                title={item.is_active ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                                                onClick={() => handleToggleStatus(item)}
-                                            >
-                                                {item.is_active ? <Lock size={12} /> : <Unlock size={12} />}
-                                            </button>
+                                            
+                                            {item.email !== currentUser?.email ? (
+                                                <button 
+                                                    className={clsx(styles.miniBtn, item.is_active ? styles.btnDelete : styles.btnUnlock)} 
+                                                    title={item.is_active ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                                                    onClick={() => handleToggleStatus(item)}
+                                                >
+                                                    {item.is_active ? <Lock size={12} /> : <Unlock size={12} />}
+                                                </button>
+                                            ) : (
+                                                <div className={styles.actionPlaceholder}></div>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

@@ -129,6 +129,15 @@ export const apiService = {
         return data;
     },
 
+    getDashboardStats: async (days = 30) => {
+        const response = await fetch(`http://localhost:5000/api/analytics/dashboard?days=${days}`, {
+            headers: apiService.getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Lỗi lấy dữ liệu thống kê');
+        return data;
+    },
+
     createStaff: async (staffData) => {
         const response = await fetch('http://localhost:5000/api/staff', {
             method: 'POST',

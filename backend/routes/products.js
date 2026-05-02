@@ -49,7 +49,7 @@ router.get('/:id', async (req, res) => {
 
 // Create product (Admin)
 router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res) => {
-    const { product_name, cat_id, specs_json, unit_price, brand, waraty_period } = req.body;
+    const { product_name, cat_id, specs_json, unit_price, brand, warranty_period } = req.body;
     const image_url = req.file ? `/uploads/products/${req.file.filename}` : null;
 
     try {
@@ -60,9 +60,9 @@ router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res) 
             .input('specs', sql.NVarChar, specs_json)
             .input('price', sql.Decimal(18, 2), unit_price)
             .input('brand', sql.VarChar, brand)
-            .input('warranty', sql.Int, waraty_period)
+            .input('warranty', sql.Int, warranty_period)
             .input('img', sql.VarChar, image_url)
-            .query(`INSERT INTO Product (product_name, cat_id, specs_json, unit_price, brand, waraty_period, image_url) 
+            .query(`INSERT INTO Product (product_name, cat_id, specs_json, unit_price, brand, warranty_period, image_url) 
                     VALUES (@name, @cat, @specs, @price, @brand, @warranty, @img)`);
         res.status(201).json({ message: 'Product created' });
     } catch (err) {
@@ -72,7 +72,7 @@ router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res) 
 
 // Update product (Admin)
 router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res) => {
-    const { product_name, cat_id, specs_json, unit_price, brand, waraty_period } = req.body;
+    const { product_name, cat_id, specs_json, unit_price, brand, warranty_period } = req.body;
     let image_url = req.body.image_url; // Use existing if no new file
 
     if (req.file) {
@@ -88,7 +88,7 @@ router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res
             .input('specs', sql.NVarChar, specs_json)
             .input('price', sql.Decimal(18, 2), unit_price)
             .input('brand', sql.VarChar, brand)
-            .input('warranty', sql.Int, waraty_period)
+            .input('warranty', sql.Int, warranty_period)
             .input('img', sql.VarChar, image_url)
             .query(`UPDATE Product SET 
                         product_name = @name, 
@@ -96,7 +96,7 @@ router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res
                         specs_json = @specs, 
                         unit_price = @price, 
                         brand = @brand, 
-                        waraty_period = @warranty, 
+                        warranty_period = @warranty, 
                         image_url = @img 
                     WHERE product_id = @id`);
         res.json({ message: 'Product updated' });

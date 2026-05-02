@@ -24,7 +24,7 @@ const ProductManagementPage = () => {
 
     // Form States
     const [productForm, setProductForm] = useState({
-        product_name: '', cat_id: '', unit_price: '', brand: '', waraty_period: '', specs_json: '{}'
+        product_name: '', cat_id: '', unit_price: '', brand: '', warranty_period: '', specs_json: '{}'
     });
     const [selectedFile, setSelectedFile] = useState(null);
     const [catName, setCatName] = useState('');
@@ -49,7 +49,7 @@ const ProductManagementPage = () => {
     // Product Handlers
     const handleAddProduct = () => {
         setEditingProduct(null);
-        setProductForm({ product_name: '', cat_id: categories[0]?.cat_id || '', unit_price: '', brand: '', waraty_period: '', specs_json: '{}' });
+        setProductForm({ product_name: '', cat_id: categories[0]?.cat_id || '', unit_price: '', brand: '', warranty_period: '', specs_json: '{}' });
         setSpecData([{ section: '', fields: [{ key: '', value: '' }] }]);
         setSelectedFile(null);
         setShowProductModal(true);
@@ -62,7 +62,7 @@ const ProductManagementPage = () => {
             cat_id: product.cat_id,
             unit_price: product.unit_price,
             brand: product.brand,
-            waraty_period: product.waraty_period,
+            warranty_period: product.warranty_period,
             specs_json: product.specs_json || '{}'
         });
         setSpecData(parseSpecs(product.specs_json));
@@ -414,7 +414,7 @@ const ProductManagementPage = () => {
                             </div>
                             <div className={styles.formGroup}>
                                 <label>Bảo hành (tháng)</label>
-                                <input type="number" value={productForm.waraty_period} onChange={e => setProductForm({...productForm, waraty_period: e.target.value})} required />
+                                <input type="number" value={productForm.warranty_period} onChange={e => setProductForm({...productForm, warranty_period: e.target.value})} required />
                             </div>
                         </div>
                         <div className={styles.formGroup}>

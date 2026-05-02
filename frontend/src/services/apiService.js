@@ -211,5 +211,59 @@ export const apiService = {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Lỗi reset mật khẩu');
         return data;
+    },
+
+    // Orders
+    getOrders: async () => {
+        const response = await fetch(`${BASE_URL}/orders`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Lỗi lấy danh sách đơn hàng');
+        return await response.json();
+    },
+
+    getOrderById: async (id) => {
+        const response = await fetch(`${BASE_URL}/orders/${id}`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Không tìm thấy đơn hàng');
+        return await response.json();
+    },
+
+    checkOrderStock: async (id) => {
+        const response = await fetch(`${BASE_URL}/orders/${id}/check-stock`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Lỗi kiểm tra tồn kho');
+        return await response.json();
+    },
+
+    processOrderExport: async (id, serials) => {
+        const response = await fetch(`${BASE_URL}/orders/${id}/export`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ serials })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi xuất kho');
+        return data;
+    },
+
+    updateOrderStatus: async (id, status) => {
+        const response = await fetch(`${BASE_URL}/orders/${id}/status`, {
+            method: 'PUT',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi cập nhật trạng thái');
+        return data;
+    },
+
+    // Activity Log
+    addActivityLog: async (logData) => {
+        // Mock activity log for now or implement if backend route exists
+        console.log('Activity Log:', logData);
+        return { success: true };
     }
 };

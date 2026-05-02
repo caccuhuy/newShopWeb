@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { sql, poolPromise } = require('./config/db');
 
 async function testAnalytics() {
@@ -18,20 +19,20 @@ async function testAnalytics() {
         const kpiResult = await pool.request().query(kpiQuery);
         console.log('KPIs:', kpiResult.recordset[0]);
 
-        console.log('Testing Revenue Chart...');
+        console.log('Testing Chart...');
         const chartQuery = `
             SELECT 
-                FORMAT(created_at, 'dd/MM') as date,
+                SUBSTRING(CONVERT(VARCHAR, created_at, 103), 1, 5) as date,
                 ISNULL(SUM(total_amount), 0) as revenue
             FROM Orders
             WHERE status = 'completed' AND created_at >= DATEADD(day, -@days, GETDATE())
-            GROUP BY FORMAT(created_at, 'dd/MM'), CAST(created_at AS DATE)
+            GROUP BY SUBSTRING(CONVERT(VARCHAR, created_at, 103), 1, 5), CAST(created_at AS DATE)
             ORDER BY CAST(created_at AS DATE)
         `;
         const chartResult = await pool.request()
             .input('days', sql.Int, days)
             .query(chartQuery);
-        console.log('Chart Data Count:', chartResult.recordset.length);
+        console.log('Chart count:', chartResult.recordset.length);
 
         console.log('Testing Low Stock...');
         const lowStockQuery = `
@@ -43,9 +44,8 @@ async function testAnalytics() {
             ORDER BY stock ASC
         `;
         const lowStockResult = await pool.request().query(lowStockQuery);
-        console.log('Low Stock Count:', lowStockResult.recordset.length);
+        console.log('Low stock count:', lowStockResult.recordset.length);
 
-        console.log('All queries passed!');
         process.exit(0);
     } catch (err) {
         console.error('Test failed:', err);

@@ -49,10 +49,10 @@ router.delete('/:tax_id', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
         
-        // Check if supplier is in use in DOC_Details
+        // Check if supplier is in use in Inventory_DOCs
         const check = await pool.request()
             .input('tax', sql.VarChar, req.params.tax_id)
-            .query("SELECT COUNT(*) as count FROM DOC_Details WHERE Suppliers_tax_id = @tax");
+            .query("SELECT COUNT(*) as count FROM Inventory_DOCs WHERE Suppliers_tax_id = @tax");
         
         if (check.recordset[0].count > 0) {
             return res.status(400).json({ error: 'Không thể xóa nhà cung cấp đã có lịch sử nhập/xuất kho.' });

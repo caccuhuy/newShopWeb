@@ -106,9 +106,8 @@ async function seed() {
                         .input('sn', sql.VarChar, sn)
                         .input('pid', sql.Int, item.product_id)
                         .input('price', sql.Decimal(18, 2), item.unit_price)
-                        .input('tax_id', sql.Char(10), supplier.tax_id)
-                        .query(`INSERT INTO DOC_Details (doc_id, serial_number, product_id, unit_price, Suppliers_tax_id)
-                                VALUES (@doc_id, @sn, @pid, @price, @tax_id)`);
+                        .query(`INSERT INTO DOC_Details (doc_id, serial_number, product_id, unit_price)
+                                VALUES (@doc_id, @sn, @pid, @price)`);
                 }
             }
         }
@@ -132,8 +131,9 @@ async function seed() {
                 .input('desc', sql.NVarChar, 'Nhập hàng định kỳ từ nhà cung cấp')
                 .input('status', sql.TinyInt, 1)
                 .input('inv_id', sql.TinyInt, inv.inventory_id)
-                .query(`INSERT INTO Inventory_DOCs (doc_id, doc_type, created_by, created_at, Doc_description, status, inventory_id)
-                        VALUES (@doc_id, @doc_type, @created_by, @created_at, @desc, @status, @inv_id)`);
+                .input('tax_id', sql.Char(10), supplier.tax_id)
+                .query(`INSERT INTO Inventory_DOCs (doc_id, doc_type, created_by, created_at, Doc_description, status, inventory_id, Suppliers_tax_id)
+                        VALUES (@doc_id, @doc_type, @created_by, @created_at, @desc, @status, @inv_id, @tax_id)`);
 
             const product = products[Math.floor(Math.random() * products.length)];
             const sn = `SN-IN-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
@@ -149,9 +149,8 @@ async function seed() {
                 .input('sn', sql.VarChar, sn)
                 .input('pid', sql.Int, product.product_id)
                 .input('price', sql.Decimal(18, 2), product.unit_price * 0.8)
-                .input('tax_id', sql.Char(10), supplier.tax_id)
-                .query(`INSERT INTO DOC_Details (doc_id, serial_number, product_id, unit_price, Suppliers_tax_id)
-                                VALUES (@doc_id, @sn, @pid, @price, @tax_id)`);
+                .query(`INSERT INTO DOC_Details (doc_id, serial_number, product_id, unit_price)
+                                VALUES (@doc_id, @sn, @pid, @price)`);
         }
 
         // Enable triggers

@@ -18,11 +18,21 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
+    console.log('Checking Admin permission for user:', req.user?.id, 'Role:', req.user?.role);
     if (req.user && req.user.role === 'Admin') {
         next();
     } else {
+        console.warn('Access denied: User is not Admin');
         res.status(403).json({ message: 'Bạn không có quyền truy cập chức năng này (Yêu cầu Admin)' });
     }
 };
 
-module.exports = { verifyToken, isAdmin };
+const isStaff = (req, res, next) => {
+    if (req.user && (req.user.role === 'Staff' || req.user.role === 'Admin')) {
+        next();
+    } else {
+        res.status(403).json({ message: 'Bạn không có quyền truy cập chức năng này (Yêu cầu Staff/Admin)' });
+    }
+};
+
+module.exports = { verifyToken, isAdmin, isStaff };

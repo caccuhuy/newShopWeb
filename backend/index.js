@@ -28,6 +28,15 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/suppliers', suppliersRoutes);
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled Error:', err);
+    res.status(err.status || 500).json({
+        error: err.message || 'Lỗi server nội bộ',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

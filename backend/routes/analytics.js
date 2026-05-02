@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../config/db');
-const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
+const { verifyToken, isAdmin, isStaff } = require('../middleware/authMiddleware');
 
 // Get Dashboard Stats
-router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
+router.get('/dashboard', verifyToken, isStaff, async (req, res) => {
     const days = parseInt(req.query.days) || 30;
 
     try {
+        console.log('Fetching Analytics for days:', days);
         const pool = await poolPromise;
 
         // 1. KPIs
-        // Note: Users table doesn't have created_at, so we return total customers for now.
-        // Product table doesn't have stock_quantity, we calculate from Stock_Units.
+        console.log('Fetching KPIs...');
         const kpiQuery = `
             SELECT 
                 (SELECT ISNULL(SUM(total_amount), 0) FROM Orders WHERE status = 'completed') as totalRevenue,
@@ -24,10 +24,11 @@ router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
         `;
 
         const kpiResult = await pool.request()
-            .input('days', sql.Int, days)
             .query(kpiQuery);
+        console.log('KPIs fetched');
 
         // 2. Revenue Chart Data (last X days)
+        console.log('Fetching Chart Data...');
         const chartQuery = `
             SELECT 
                 SUBSTRING(CONVERT(VARCHAR, created_at, 103), 1, 5) as date,
@@ -41,8 +42,10 @@ router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
         const chartResult = await pool.request()
             .input('days', sql.Int, days)
             .query(chartQuery);
+        console.log('Chart Data fetched');
 
-        // 3. Low Stock Products List (calculate from Stock_Units)
+        // 3. Low Stock Products List
+        console.log('Fetching Low Stock Data...');
         const lowStockQuery = `
             SELECT TOP 5 p.product_id as id, p.product_name as name, p.brand, COUNT(s.serial_number) as stock
             FROM Product p
@@ -52,6 +55,7 @@ router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
             ORDER BY stock ASC
         `;
         const lowStockResult = await pool.request().query(lowStockQuery);
+        console.log('Low Stock Data fetched');
 
         res.json({
             kpis: kpiResult.recordset[0],
@@ -60,8 +64,12 @@ router.get('/dashboard', verifyToken, isAdmin, async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Analytics error:', err);
-        res.status(500).json({ error: 'Lỗi server khi tải báo cáo: ' + err.message });
+        console.error('Detailed Analytics error:', err);
+        res.status(500).json({ 
+            error: 'Lỗi server khi tải báo cáo',
+            message: err.message,
+            stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
     }
 });
 

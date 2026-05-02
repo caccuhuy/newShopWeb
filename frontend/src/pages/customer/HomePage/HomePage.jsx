@@ -27,8 +27,8 @@ const HomePage = () => {
     }, []);
 
     const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
+        (p.brand?.toLowerCase().includes(searchQuery.toLowerCase()) || false)
     );
 
     return (
@@ -68,8 +68,8 @@ const HomePage = () => {
                         <div className={styles.loading}>Đang tải sản phẩm...</div>
                     ) : filteredProducts.length > 0 ? (
                         <div className={styles.grid}>
-                            {filteredProducts.map(product => (
-                                <ProductCard key={product.id} product={product} />
+                            {filteredProducts.map((product, index) => (
+                                <ProductCard key={product.id || index} product={product} />
                             ))}
                         </div>
                     ) : (

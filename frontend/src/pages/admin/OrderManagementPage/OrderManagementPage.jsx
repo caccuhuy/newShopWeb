@@ -56,47 +56,63 @@ const OrderManagementPage = () => {
         }
     };
 
-    const handleConfirmTransfer = async (orderId) => {
-        if (!window.confirm('Xác nhận đơn hàng và chuyển sang bộ phận kho xử lý?')) return;
-        
-        try {
-            const result = await apiService.processOrderExport(orderId, []);
-            loadOrders();
-            setAlertConfig({
-                isOpen: true,
-                type: 'success',
-                title: 'Thành công',
-                message: `Đơn hàng đã được chuyển sang bộ phận kho. Mã phiếu xuất nháp: ${result.docId}`
-            });
-        } catch (error) {
-            setAlertConfig({
-                isOpen: true,
-                type: 'error',
-                title: 'Lỗi',
-                message: error.message
-            });
-        }
+    const handleConfirmTransfer = (orderId) => {
+        setAlertConfig({
+            isOpen: true,
+            type: 'warning',
+            title: 'Xác nhận chuyển kho',
+            message: 'Xác nhận đơn hàng và chuyển sang bộ phận kho xử lý?',
+            onConfirm: async () => {
+                setAlertConfig(prev => ({ ...prev, isOpen: false }));
+                try {
+                    const result = await apiService.processOrderExport(orderId, []);
+                    loadOrders();
+                    setAlertConfig({
+                        isOpen: true,
+                        type: 'success',
+                        title: 'Thành công',
+                        message: `Đơn hàng đã được chuyển sang bộ phận kho. Mã phiếu xuất nháp: ${result.docId}`
+                    });
+                } catch (error) {
+                    setAlertConfig({
+                        isOpen: true,
+                        type: 'error',
+                        title: 'Lỗi',
+                        message: error.message
+                    });
+                }
+            }
+        });
     };
 
-    const handleUpdateStatus = async (orderId, newStatus) => {
-        if (!window.confirm(`Bạn có chắc muốn cập nhật trạng thái đơn hàng thành ${newStatus}?`)) return;
-        try {
-            await apiService.updateOrderStatus(orderId, newStatus);
-            loadOrders();
-            setAlertConfig({
-                isOpen: true,
-                type: 'success',
-                title: 'Thành công',
-                message: `Đã cập nhật trạng thái đơn hàng thành ${newStatus}.`
-            });
-        } catch (error) {
-            setAlertConfig({
-                isOpen: true,
-                type: 'error',
-                title: 'Lỗi',
-                message: error.message
-            });
-        }
+    const handleUpdateStatus = (orderId, newStatus) => {
+        const actionText = newStatus === 'cancelled' ? 'hủy' : 'cập nhật';
+        setAlertConfig({
+            isOpen: true,
+            type: newStatus === 'cancelled' ? 'error' : 'warning',
+            title: 'Xác nhận thay đổi',
+            message: `Bạn có chắc muốn ${actionText} đơn hàng này?`,
+            onConfirm: async () => {
+                setAlertConfig(prev => ({ ...prev, isOpen: false }));
+                try {
+                    await apiService.updateOrderStatus(orderId, newStatus);
+                    loadOrders();
+                    setAlertConfig({
+                        isOpen: true,
+                        type: 'success',
+                        title: 'Thành công',
+                        message: `Đã cập nhật trạng thái đơn hàng thành ${newStatus === 'cancelled' ? 'Đã hủy' : newStatus}.`
+                    });
+                } catch (error) {
+                    setAlertConfig({
+                        isOpen: true,
+                        type: 'error',
+                        title: 'Lỗi',
+                        message: error.message
+                    });
+                }
+            }
+        });
     };
 
     const getStatusBadge = (status) => {
@@ -301,6 +317,7 @@ const OrderManagementPage = () => {
                     type={alertConfig.type}
                     title={alertConfig.title}
                     message={alertConfig.message}
+                    onConfirm={alertConfig.onConfirm}
                 />
             </div>
         </AdminLayout>

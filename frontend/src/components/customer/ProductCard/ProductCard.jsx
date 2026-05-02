@@ -20,7 +20,7 @@ const ProductCard = ({ product }) => {
             <div className={styles.info}>
                 <span className={styles.brand}>{product.brand}</span>
                 <h3 className={styles.name}>{product.name}</h3>
-                <span className={styles.price}>{product.price.toLocaleString()}đ</span>
+                <span className={styles.price}>{(product.price || 0).toLocaleString()}đ</span>
             </div>
             <div className={styles.footer}>
                 <button className={styles.addToCartBtn} onClick={handleAddToCart}>

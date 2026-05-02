@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
+const { logActivity } = require('../utils/logger');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -64,6 +65,9 @@ router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res) 
             .input('img', sql.VarChar, image_url)
             .query(`INSERT INTO Product (product_name, cat_id, specs_json, unit_price, brand, warranty_period, image_url) 
                     VALUES (@name, @cat, @specs, @price, @brand, @warranty, @img)`);
+        
+        await logActivity(req.user.id, `Thêm sản phẩm mới: ${product_name}`, 'success');
+
         res.status(201).json({ message: 'Product created' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -99,6 +103,9 @@ router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res
                         warranty_period = @warranty, 
                         image_url = @img 
                     WHERE product_id = @id`);
+        
+        await logActivity(req.user.id, `Cập nhật thông tin sản phẩm: ${product_name} (ID: ${req.params.id})`, 'info');
+
         res.json({ message: 'Product updated' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -138,6 +145,8 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
             const filePath = path.join(__dirname, '../public', imgUrl);
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         }
+
+        await logActivity(req.user.id, `Xóa sản phẩm (ID: ${req.params.id})`, 'danger');
 
         res.json({ message: 'Product deleted' });
     } catch (err) {

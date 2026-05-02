@@ -335,5 +335,14 @@ export const apiService = {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Lỗi cập nhật chi tiết phiếu');
         return data;
+    },
+
+    // Activity Logs
+    getActivityLogs: async () => {
+        const response = await fetch(`${BASE_URL}/logs`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Lỗi lấy nhật ký hoạt động');
+        return await response.json();
     }
 };

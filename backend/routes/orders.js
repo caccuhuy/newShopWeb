@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isStaff } = require('../middleware/authMiddleware');
+const { logActivity } = require('../utils/logger');
 
 // Get all orders (Staff/Admin)
 router.get('/', verifyToken, isStaff, async (req, res) => {
@@ -159,6 +160,7 @@ router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
             .query("UPDATE Orders SET status = 'processing' WHERE order_id = @id");
 
         await transaction.commit();
+        await logActivity(staffId, `Xác nhận đơn hàng #${orderId} và tạo phiếu xuất kho: ${docId}`, 'success');
         res.json({ message: 'Đã xác nhận đơn hàng và tạo phiếu xuất kho nháp', docId });
     } catch (err) {
         console.error('Export Error:', err);
@@ -185,6 +187,18 @@ router.put('/:id/status', verifyToken, isStaff, async (req, res) => {
             .input('id', sql.VarChar, req.params.id)
             .input('status', sql.VarChar, status)
             .query("UPDATE Orders SET status = @status WHERE order_id = @id");
+        
+        const statusMap = {
+            'pending': 'Chờ xử lý',
+            'processing': 'Đang xử lý',
+            'shipped': 'Đang giao',
+            'completed': 'Hoàn thành',
+            'cancelled': 'Đã hủy'
+        };
+        const statusStr = statusMap[status] || status;
+        const logType = status === 'cancelled' ? 'danger' : 'info';
+        await logActivity(req.user.id, `Cập nhật đơn hàng #${req.params.id} sang trạng thái: ${statusStr}`, logType);
+
         res.json({ message: 'Trạng thái đơn hàng đã được cập nhật' });
     } catch (err) {
         res.status(500).json({ error: err.message });

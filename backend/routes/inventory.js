@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isStaff } = require('../middleware/authMiddleware');
+const { logActivity } = require('../utils/logger');
 
 // Get all inventory documents
 router.get('/docs', verifyToken, isStaff, async (req, res) => {
@@ -166,6 +167,10 @@ router.post('/docs', verifyToken, isStaff, async (req, res) => {
         }
 
         await transaction.commit();
+        
+        const typeStr = parseInt(doc_type) === 1 ? 'Nhập kho' : (parseInt(doc_type) === 2 ? 'Xuất kho' : 'Chứng từ kho');
+        await logActivity(req.user.id, `Tạo phiếu ${typeStr} mới: ${doc_id}`, 'info');
+
         res.status(201).json({ message: 'Tạo phiếu kho thành công', doc_id });
     } catch (err) {
         await transaction.rollback();
@@ -294,6 +299,11 @@ router.put('/docs/:id/status', verifyToken, isStaff, async (req, res) => {
             }
 
             await transaction.commit();
+            
+            const statusStr = status === 1 ? 'Duyệt' : 'Hủy';
+            const logType = status === 1 ? 'success' : 'warning';
+            await logActivity(req.user.id, `${statusStr} phiếu kho: ${docId}`, logType);
+
             res.json({ message: status === 1 ? 'Duyệt phiếu thành công' : 'Hủy phiếu thành công' });
         } catch (err) {
             await transaction.rollback();

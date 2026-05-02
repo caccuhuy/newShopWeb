@@ -19,6 +19,7 @@ const staffRoutes = require('./routes/staff');
 const analyticsRoutes = require('./routes/analytics');
 const categoriesRoutes = require('./routes/categories');
 const suppliersRoutes = require('./routes/suppliers');
+const inventoryRoutes = require('./routes/inventory');
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
@@ -27,6 +28,7 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/suppliers', suppliersRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

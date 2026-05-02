@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BarChart3, FolderOpen, Package, LogOut, Users, ClipboardList, History } from 'lucide-react';
+import { BarChart3, FolderOpen, Package, LogOut, Users, ClipboardList, History, Boxes } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import styles from './AdminSidebar.module.css';
 
@@ -25,6 +25,9 @@ const AdminSidebar = () => {
                 </NavLink>
                 <NavLink to="/admin/orders" className={({ isActive }) => isActive ? `${styles.navBtn} ${styles.activeBtn}` : styles.navBtn}>
                     <ClipboardList size={18} /> <span>Đơn hàng</span>
+                </NavLink>
+                <NavLink to="/admin/inventory" className={({ isActive }) => isActive ? `${styles.navBtn} ${styles.activeBtn}` : styles.navBtn}>
+                    <Boxes size={18} /> <span>Quản lý Kho</span>
                 </NavLink>
                 {isAdmin && (
                     <>

@@ -11,12 +11,19 @@ import OrderManagementPage from '../pages/admin/OrderManagementPage/OrderManagem
 import ActivityLogPage from '../pages/admin/ActivityLogPage/ActivityLogPage';
 import ProductManagementPage from '../pages/admin/ProductManagementPage/ProductManagementPage';
 import SupplierManagementPage from '../pages/admin/SupplierManagementPage/SupplierManagementPage';
+import InventoryManagementPage from '../pages/admin/InventoryManagementPage/InventoryManagementPage.jsx';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 function AppRoutes() {
   return (
     <Router>
       <Routes>
+        <Route path="/admin/inventory-test" element={<div>Inventory Test Page</div>} />
+        <Route path="/admin/inventory" element={
+            <ProtectedRoute>
+                <InventoryManagementPage />
+            </ProtectedRoute>
+        } />
         {/* Customer Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
@@ -27,11 +34,6 @@ function AppRoutes() {
         <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Protected Admin Routes */}
-        <Route path="/admin" element={
-            <ProtectedRoute>
-                <AdminDashboard />
-            </ProtectedRoute>
-        } />
         <Route path="/admin/staff" element={
             <ProtectedRoute requireAdmin={true}>
                 <StaffManagementPage />
@@ -55,6 +57,11 @@ function AppRoutes() {
         <Route path="/admin/suppliers" element={
             <ProtectedRoute requireAdmin={true}>
                 <SupplierManagementPage />
+            </ProtectedRoute>
+        } />
+        <Route path="/admin" element={
+            <ProtectedRoute>
+                <AdminDashboard />
             </ProtectedRoute>
         } />
       </Routes>

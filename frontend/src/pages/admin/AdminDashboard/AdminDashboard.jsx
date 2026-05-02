@@ -24,13 +24,18 @@ const AdminPage = () => {
         totalRevenue: 0,
         totalOrders: 0,
         totalCustomers: 0,
-        lowStockCount: 0
+        lowStockCount: 0,
+        kpis: {},
+        revenueData: [],
+        lowStockProducts: []
     });
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState(30);
     const [chartType, setChartType] = useState('line');
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
+    const [allLowStock, setAllLowStock] = useState([]);
+    const [isStockModalOpen, setIsStockModalOpen] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
@@ -54,6 +59,16 @@ const AdminPage = () => {
         }
     };
 
+    const handleViewAllStock = async () => {
+        try {
+            setIsStockModalOpen(true);
+            const data = await apiService.getLowStockProducts();
+            setAllLowStock(data);
+        } catch (error) {
+            console.error('Fetch low stock error:', error);
+        }
+    };
+
     useEffect(() => {
         if (!isStaff) {
             navigate('/login');
@@ -61,8 +76,6 @@ const AdminPage = () => {
         }
         fetchData();
     }, [isStaff, navigate, timeRange]);
-
-
 
     if (!isStaff) return null;
 
@@ -232,7 +245,7 @@ const AdminPage = () => {
                         <section className={styles.lowStockList}>
                             <div className={styles.sideHeader}>
                                 <h3 className={styles.sideTitle}>Cảnh báo tồn kho</h3>
-                                <button className={styles.viewAllBtn}>Tất cả</button>
+                                <button className={styles.viewAllBtn} onClick={handleViewAllStock}>Tất cả</button>
                             </div>
                             <div className={styles.stockItems}>
                                 {loading ? (
@@ -252,12 +265,49 @@ const AdminPage = () => {
                                 )}
                             </div>
                         </section>
-                        
                     </div>
                 </div>
 
-                {/* Modals are kept for functionality */}
-
+                <Modal 
+                    isOpen={isStockModalOpen} 
+                    onClose={() => setIsStockModalOpen(false)} 
+                    title="Tất cả cảnh báo tồn kho (Dưới 10 cái)"
+                    width="600px"
+                >
+                    <div style={{padding: '1rem'}}>
+                        <div style={{maxHeight: '500px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '0.5rem'}}>
+                            {allLowStock.length > 0 ? (
+                                allLowStock.map(p => (
+                                    <div key={p.id} style={{
+                                        padding: '1rem', 
+                                        borderBottom: '1px solid #f1f5f9', 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div>
+                                            <div style={{fontWeight: 600, fontSize: '0.95rem'}}>{p.name}</div>
+                                            <div style={{fontSize: '0.75rem', color: '#64748b'}}>{p.brand}</div>
+                                        </div>
+                                        <div style={{
+                                            padding: '0.25rem 0.75rem', 
+                                            borderRadius: '1rem', 
+                                            background: '#fff7ed', 
+                                            color: '#d97706', 
+                                            fontWeight: 700,
+                                            fontSize: '0.875rem',
+                                            border: '1px solid #ffedd5'
+                                        }}>
+                                            {p.stock} cái
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{padding: '2rem', textAlign: 'center', color: '#64748b'}}>Không có sản phẩm nào sắp hết hàng.</div>
+                            )}
+                        </div>
+                    </div>
+                </Modal>
 
                 <AlertModal 
                     isOpen={alertConfig.isOpen}

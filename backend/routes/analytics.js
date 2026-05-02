@@ -73,4 +73,23 @@ router.get('/dashboard', verifyToken, isStaff, async (req, res) => {
     }
 });
 
+// Get All Low Stock Products
+router.get('/low-stock', verifyToken, isStaff, async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const lowStockQuery = `
+            SELECT p.product_id as id, p.product_name as name, p.brand, COUNT(s.serial_number) as stock
+            FROM Product p
+            LEFT JOIN Stock_Units s ON p.product_id = s.product_id AND s.status = 1
+            GROUP BY p.product_id, p.product_name, p.brand
+            HAVING COUNT(s.serial_number) <= 10
+            ORDER BY stock ASC
+        `;
+        const result = await pool.request().query(lowStockQuery);
+        res.json(result.recordset);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;

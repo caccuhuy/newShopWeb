@@ -127,7 +127,7 @@ router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
             .input('doc_id', sql.Char(10), docId)
             .input('doc_type', sql.TinyInt, 2)
             .input('created_by', sql.VarChar, staffId)
-            .input('desc', sql.NVarChar, `Xuất kho cho đơn hàng #${orderId}`)
+            .input('desc', sql.NVarChar, `Phiếu xuất chờ duyệt cho đơn hàng #${orderId}`)
             .input('status', sql.TinyInt, 0) // Start as Draft
             .input('order_ref', sql.VarChar, orderId)
             .input('inv_id', sql.TinyInt, 1)
@@ -149,20 +149,17 @@ router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
             // The trigger trg_HandleInventoryApproval will do it when we set status to 1.
         }
 
-        // 3. Approve the document (This triggers trg_HandleInventoryApproval to update Stock_Units)
-        const approveRequest = new sql.Request(transaction);
-        await approveRequest
-            .input('doc_id', sql.Char(10), docId)
-            .query("UPDATE Inventory_DOCs SET status = 1 WHERE doc_id = @doc_id");
+        // 3. (REMOVED) We no longer auto-approve the document here. 
+        // Approval will be handled in the Inventory Management module.
 
-        // 4. Update Order Status
+        // 4. Update Order Status to 'processing' (Waiting for export approval)
         const orderRequest = new sql.Request(transaction);
         await orderRequest
             .input('id', sql.VarChar, orderId)
-            .query("UPDATE Orders SET status = 'shipping' WHERE order_id = @id");
+            .query("UPDATE Orders SET status = 'processing' WHERE order_id = @id");
 
         await transaction.commit();
-        res.json({ message: 'Xuất kho thành công', docId });
+        res.json({ message: 'Đã xác nhận đơn hàng và tạo phiếu xuất kho nháp', docId });
     } catch (err) {
         console.error('Export Error:', err);
         if (transaction && transaction.active) {

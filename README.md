@@ -59,16 +59,3 @@ newShopWeb/
 | **Admin** | `admin@admin.com` | `123456` |
 | **Staff** | `staff@staff.com` | `123456` |
 | **User** | `cust1@gmail.com` | `123456` |
-
-## ✨ Các tính năng chính của Admin Dashboard
-
-1. **Báo cáo & Phân tích**: Theo dõi doanh thu, đơn hàng, khách hàng qua biểu đồ trực quan (Line/Bar chart).
-2. **Quản lý Sản phẩm**:
-   - Thêm/Sửa/Xóa sản phẩm với giao diện hiện đại.
-   - Nhập thông số kỹ thuật (Specs) theo cấu hình nhóm (Nested JSON).
-   - Tự động quản lý hình ảnh local server.
-3. **Quản lý Kho hàng**: Theo dõi tồn kho thời gian thực với chỉ báo màu sắc (Xanh/Cam/Đỏ).
-4. **Lọc & Tìm kiếm**: Bộ lọc nâng cao theo Danh mục và Thương hiệu.
-
----
-*Dự án đang trong quá trình phát triển và hoàn thiện các tính năng nâng cao.*

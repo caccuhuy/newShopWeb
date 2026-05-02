@@ -180,6 +180,15 @@ export const apiService = {
         return data;
     },
 
+    getLowStockProducts: async () => {
+        const response = await fetch(`${BASE_URL}/analytics/low-stock`, {
+            headers: getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi lấy danh sách tồn kho thấp');
+        return data;
+    },
+
     createStaff: async (staffData) => {
         const response = await fetch(`${BASE_URL}/staff`, {
             method: 'POST',
@@ -265,5 +274,66 @@ export const apiService = {
         // Mock activity log for now or implement if backend route exists
         console.log('Activity Log:', logData);
         return { success: true };
+    },
+
+    // Inventory Management
+    getInventoryDocs: async () => {
+        const response = await fetch(`${BASE_URL}/inventory/docs`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Lỗi lấy danh sách phiếu kho');
+        return await response.json();
+    },
+
+    getInventoryDocById: async (id) => {
+        const response = await fetch(`${BASE_URL}/inventory/docs/${id}`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Không tìm thấy phiếu kho');
+        return await response.json();
+    },
+
+    validateSerial: async (serial_number, doc_type) => {
+        const response = await fetch(`${BASE_URL}/inventory/validate-serial`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ serial_number, doc_type })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi kiểm tra Serial');
+        return data;
+    },
+
+    createInventoryDoc: async (docData) => {
+        const response = await fetch(`${BASE_URL}/inventory/docs`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(docData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi tạo phiếu kho');
+        return data;
+    },
+
+    updateInventoryDocStatus: async (id, status) => {
+        const response = await fetch(`${BASE_URL}/inventory/docs/${id}/status`, {
+            method: 'PUT',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi cập nhật trạng thái phiếu');
+        return data;
+    },
+
+    updateInventoryDocDetails: async (id, details) => {
+        const response = await fetch(`${BASE_URL}/inventory/docs/${id}/details`, {
+            method: 'PUT',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ details })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Lỗi cập nhật chi tiết phiếu');
+        return data;
     }
 };

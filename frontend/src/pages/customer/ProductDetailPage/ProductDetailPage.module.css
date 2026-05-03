@@ -1,0 +1,257 @@
+.wrapper {
+    background-color: white;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 8rem 1.5rem 4rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr 1.2fr;
+    }
+}
+
+.imagePanel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.imageSection {
+    background-color: #f9fafb;
+    border-radius: 2rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+}
+
+.mainImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.infoSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #3451B2;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3451B2;
+    margin-bottom: 2rem;
+}
+
+.description {
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.actions {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .actions {
+        grid-template-columns: auto 1fr;
+        align-items: center;
+    }
+}
+
+.quantitySelector {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid #e5e7eb;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+    max-width: 220px;
+    background-color: #ffffff;
+}
+
+.qtyBtn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #374151;
+}
+
+.qtyInput {
+    width: 3rem;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    color: #111827;
+    font-weight: 700;
+    outline: none;
+    padding: 0.15rem 0.35rem;
+}
+
+.qtyInput::-webkit-inner-spin-button,
+.qtyInput::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.qtyInput[type=number] {
+    -moz-appearance: textfield;
+}
+
+.addBtn {
+    width: 100%;
+    background-color: #3451B2;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.addBtn:hover {
+    background-color: #2563eb;
+}
+
+.specs {
+    background-color: #f3f4f6;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.specsTitle {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.specList {
+    display: grid;
+    gap: 1rem;
+}
+
+.specSection {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #e5e7eb;
+}
+
+.specSectionTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #0f172a;
+}
+
+.specItemList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.specItem {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 1rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.specItem:last-child {
+    border-bottom: none;
+}
+
+.specItemKey {
+    color: #475569;
+    font-weight: 600;
+}
+
+.specItemValue {
+    color: #0f172a;
+    font-weight: 500;
+    white-space: pre-wrap;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.quantitySelector {
+    display: flex;
+    align-items: center;
+    border: 2px solid #e5e7eb;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+}
+
+.qtyBtn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #374151;
+}
+
+.qtyInput {
+    width: 2rem;
+    text-align: center;
+    border: none;
+    font-weight: 700;
+    outline: none;
+}
+
+.addBtn {
+    flex-grow: 1;
+    background-color: #3451B2;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.addBtn:hover {
+    background-color: #2563eb;
+}

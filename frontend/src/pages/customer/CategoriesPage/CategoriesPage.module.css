@@ -1,0 +1,53 @@
+.wrapper {
+    min-height: 100vh;
+    background: #f8fafc;
+    padding-top: 5rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #111827;
+}
+
+.message {
+    padding: 2rem;
+    color: #4b5563;
+    text-align: center;
+}
+
+.error {
+    padding: 2rem;
+    color: #b91c1c;
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: #111827;
+}
+
+.card p {
+    color: #4b5563;
+    line-height: 1.7;
+}

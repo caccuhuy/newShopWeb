@@ -1,0 +1,505 @@
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #111827;
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.timeFilter {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #f3f4f6;
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+.selectFilter {
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    color: #111827;
+    outline: none;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.btnPrimary {
+    padding: 0.625rem 1.25rem;
+    background-color: #3451B2;
+    color: white;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+    box-shadow: 0 10px 15px -3px rgba(52, 81, 178, 0.2);
+}
+
+.btnPrimary:hover {
+    background-color: #1e3a8a;
+    transform: translateY(-1px);
+}
+
+/* KPI Cards */
+.quickStats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.kpiCard {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    border: 1px solid #f3f4f6;
+    transition: all 0.3s;
+}
+
+.kpiCard:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.kpiHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.kpiIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpiValue {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #111827;
+    margin: 0;
+}
+
+.kpiLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.trendUp { background-color: #f0fdf4; color: #15803d; }
+.trendDown { background-color: #fef2f2; color: #b91c1c; }
+
+/* Main Grid */
+.mainGrid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.chartSection {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    border: 1px solid #f3f4f6;
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.chartTitle {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.chartActions {
+    display: flex;
+    background-color: #f9fafb;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.chartBtn {
+    padding: 0.375rem 0.75rem;
+    font-size: 10px;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    color: #6b7280;
+}
+
+.chartBtnActive {
+    background-color: white;
+    color: #111827;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.chartWrapper {
+    height: 300px;
+}
+
+.loadingChart {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+/* Side Column */
+.sideColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.lowStockList {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    border: 1px solid #f3f4f6;
+}
+
+.sideHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sideTitle {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #111827;
+}
+
+.viewAllBtn {
+    font-size: 10px;
+    font-weight: 700;
+    color: #3451B2;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.stockItems {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.stockItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f9fafb;
+}
+
+.stockInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.stockName {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.stockBrand {
+    font-size: 10px;
+    color: #9ca3af;
+}
+
+.stockCount {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #ef4444;
+    background-color: #fef2f2;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.promoCard {
+    background-color: #3451B2;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    color: white;
+}
+
+.promoIcon {
+    width: 2rem;
+    height: 2rem;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.promoText {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+}
+
+.promoBtn {
+    width: 100%;
+    padding: 0.625rem;
+    background-color: white;
+    color: #3451B2;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* Inventory Table */
+.inventorySection {
+    background-color: white;
+    border-radius: 1.5rem;
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+}
+
+.tableHeader {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.tableTitle {
+    font-size: 0.875rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.tableSubtitle {
+    font-size: 10px;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.tableActions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.searchWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 0.75rem;
+    color: #9ca3af;
+}
+
+.searchInput {
+    padding: 0.5rem 1rem 0.5rem 2.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #f3f4f6;
+    font-size: 0.75rem;
+    width: 240px;
+    outline: none;
+}
+
+.btnIcon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #f3f4f6;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 800;
+    color: #9ca3af;
+    text-transform: uppercase;
+    background-color: #f9fafb;
+}
+
+.td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f9fafb;
+}
+
+.productInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.productImg {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    object-fit: cover;
+}
+
+.pName {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.pBrand {
+    font-size: 10px;
+    color: #9ca3af;
+    text-transform: uppercase;
+}
+
+.statusDot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.dotGreen { background-color: #22c55e; }
+.dotOrange { background-color: #f97316; }
+.dotRed { background-color: #ef4444; }
+
+.statusLabel {
+    font-size: 10px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.stockBadge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.badgeLow { background-color: #fef2f2; color: #ef4444; }
+.badgeNormal { background-color: #eff6ff; color: #3451B2; }
+
+.rowActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.miniBtn {
+    padding: 0.375rem 0.75rem;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btnIn { background-color: #f0fdf4; color: #15803d; }
+.btnOut { background-color: #fff7ed; color: #c2410c; }
+
+/* Form Styles */
+.form { display: flex; flex-direction: column; gap: 1rem; }
+.formGroup { display: flex; flex-direction: column; gap: 0.5rem; }
+.labelBold { font-size: 0.75rem; font-weight: 700; color: #4b5563; }
+.inputField { padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.875rem; outline: none; }
+.inputField:focus { border-color: #3451B2; }
+.formGrid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.btnFull { width: 100%; padding: 0.75rem; background-color: #3451B2; color: white; border: none; border-radius: 0.75rem; font-weight: 700; margin-top: 1rem; cursor: pointer; }
+
+/* Modal specific */
+.confirmHeader { text-align: center; margin-bottom: 2rem; }
+.confirmHeader h4 { margin: 1rem 0 0.25rem; font-size: 1rem; font-weight: 800; }
+.confirmHeader p { font-size: 0.75rem; color: #9ca3af; }
+
+.iconCircle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.modalActions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 2rem; }
+.btnGhost { padding: 0.625rem 1.25rem; background: none; border: none; color: #6b7280; font-weight: 700; cursor: pointer; }
+
+/* Utils */
+.bgBlue { background-color: #eff6ff; color: #3451B2; }
+.bgPurple { background-color: #faf5ff; color: #7e22ce; }
+.bgGreen { background-color: #f0fdf4; color: #15803d; }
+.bgOrange { background-color: #fff7ed; color: #c2410c; }
+.noData { color: #9ca3af; font-size: 0.75rem; text-align: center; padding: 1rem; }

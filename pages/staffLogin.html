@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | ArchitectLedger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <main class="login-container">
+        <div class="login-card">
+            <section class="login-card__brand">
+                <div class="brand__header">
+                    <div class="brand__logo-icon">
+                        <i class="ri-bank-line"></i>
+                    </div>
+                    <span class="brand__name">Logic & Ledger</span>
+                </div>
+                
+                <div class="brand__content">
+                    <h1 class="brand__title">Portal Quản lý <br> Kiến trúc & Kho hàng</h1>
+                    <p class="brand__desc">Hệ thống quản trị tập trung dành riêng cho đội ngũ nhân viên ArchitectLedger. Đăng nhập để truy cập kho dữ liệu và báo cáo.</p>
+                </div>
+
+                <div class="brand__footer">
+                    <div class="avatar-group">
+                        <img src="https://i.pravatar.cc/100?img=1" alt="Staff 1" class="avatar">
+                        <img src="https://i.pravatar.cc/100?img=2" alt="Staff 2" class="avatar">
+                        <img src="https://i.pravatar.cc/100?img=3" alt="Staff 3" class="avatar">
+                    </div>
+                    <span>Tham gia cùng +500 nhân sự</span>
+                </div>
+            </section>
+
+            <section class="login-card__form-wrapper">
+                <div class="form-content">
+                    <h2 class="form-content__title">Chào mừng trở lại</h2>
+                    <p class="form-content__subtitle">Vui lòng nhập thông tin tài khoản nhân viên để tiếp tục.</p>
+
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="email">ĐỊA CHỈ EMAIL CÔNG TY</label>
+                            <div class="input-wrapper">
+                                <i class="ri-mail-line input-icon"></i>
+                                <input type="email" id="email" placeholder="name@architectledger.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-group__header">
+                                <label for="password">MẬT KHẨU</label>
+                                <a href="#" class="link-forgot">Quên mật khẩu?</a>
+                            </div>
+                            <div class="input-wrapper">
+                                <i class="ri-lock-line input-icon"></i>
+                                <input type="password" id="password" placeholder="••••••••" required>
+                                <button type="button" id="togglePassword" class="btn-toggle">
+                                    <i class="ri-eye-line" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" checked>
+                                <span class="checkmark"></span>
+                                Ghi nhớ đăng nhập trên thiết bị này
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            Đăng nhập vào hệ thống
+                            <i class="ri-arrow-right-line"></i>
+                        </button>
+                    </form>
+
+                    <footer class="form-footer">
+                        Bằng việc đăng nhập, bạn đồng ý với <a href="#">Quy định bảo mật</a> và <a href="#">Điều khoản sử dụng</a> nội bộ của ArchitectLedger.
+                    </footer>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/staff-login.js"></script>
+</body>
+</html>

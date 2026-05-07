@@ -43,6 +43,23 @@
     object-fit: contain;
 }
 
+.mainImagePlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    gap: 1rem;
+    font-weight: 600;
+}
+
+.placeholderIcon {
+    opacity: 0.5;
+}
+
 .infoSection {
     display: flex;
     flex-direction: column;

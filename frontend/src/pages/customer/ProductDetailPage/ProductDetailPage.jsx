@@ -4,6 +4,7 @@ import Header from '../../../components/common/Header/Header';
 import { apiService } from '../../../services/apiService';
 import { useCart } from '../../../context/CartContext';
 import styles from './ProductDetailPage.module.css';
+import { Image as ImageIcon } from 'lucide-react';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -12,6 +13,7 @@ const ProductDetailPage = () => {
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [imgError, setImgError] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -33,7 +35,7 @@ const ProductDetailPage = () => {
 
     const safeSpecs = product.specs && typeof product.specs === 'object' ? product.specs : {};
     const formattedPrice = Number(product.price || 0).toLocaleString();
-    const imageUrl = product.image_url || 'https://via.placeholder.com/640x480?text=No+Image';
+    const imageUrl = product.image_url;
 
     const renderSpecValue = (value) => {
         if (value === null || value === undefined) return 'N/A';
@@ -78,7 +80,19 @@ const ProductDetailPage = () => {
                 <div className={styles.grid}>
                     <div className={styles.imagePanel}>
                         <div className={styles.imageSection}>
-                            <img src={imageUrl} alt={product.name} className={styles.mainImage} />
+                            {imageUrl && !imgError ? (
+                                <img 
+                                    src={imageUrl} 
+                                    alt={product.name} 
+                                    className={styles.mainImage} 
+                                    onError={() => setImgError(true)}
+                                />
+                            ) : (
+                                <div className={styles.mainImagePlaceholder}>
+                                    <ImageIcon size={80} className={styles.placeholderIcon} />
+                                    <span>Không có hình ảnh</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.actions}>

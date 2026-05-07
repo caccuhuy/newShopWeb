@@ -23,6 +23,7 @@ const categoriesRoutes = require('./routes/categories');
 const suppliersRoutes = require('./routes/suppliers');
 const inventoryRoutes = require('./routes/inventory');
 const logsRoutes = require('./routes/logs');
+const customerProductsRoutes = require('./routes/customerProducts');
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
@@ -35,6 +36,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/suppliers', suppliersRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/customer-products', customerProductsRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

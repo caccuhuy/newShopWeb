@@ -23,7 +23,7 @@ const Header = () => {
     return (
         <header className={styles.header}>
             <div className={styles.container}>
-                <Link to="/" className={styles.logo}>ArchitectLedger</Link>
+                <Link to="/" className={styles.logo}>Shop</Link>
                 
                 <nav className={styles.nav}>
                     <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
@@ -35,13 +35,9 @@ const Header = () => {
                             Profile
                         </NavLink>
                     )}
-                    {isStaff ? (
+                    {isStaff && (
                         <NavLink to="/admin" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
                             Admin
-                        </NavLink>
-                    ) : (
-                        !isAuthenticated && <NavLink to="/login" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-                            Login
                         </NavLink>
                     )}
                 </nav>

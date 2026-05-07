@@ -2,6 +2,7 @@
     min-height: 100vh;
     background: #f8fafc;
     padding-top: 5rem;
+    position: relative;
 }
 
 .container {
@@ -50,4 +51,40 @@
 .card p {
     color: #4b5563;
     line-height: 1.7;
+}
+
+.categoryHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.backButton {
+    background: #f3f4f6;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    color: #374151;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.backButton:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.clickHint {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
 }

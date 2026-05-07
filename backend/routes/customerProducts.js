@@ -15,16 +15,23 @@ router.get('/', async (req, res) => {
             ORDER BY p.product_name
         `);
 
-        const products = result.recordset.map(product => ({
-            id: product.product_id,
-            name: product.product_name,
-            brand: product.brand,
-            price: product.unit_price,
-            image_url: product.image_url,
-            specs: product.specs_json,
-            category: product.category_name,
-            stock: product.stock
-        }));
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const products = result.recordset.map(product => {
+            const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
+                ? `${baseUrl}${product.image_url}`
+                : product.image_url;
+
+            return {
+                id: product.product_id,
+                name: product.product_name,
+                brand: product.brand,
+                price: product.unit_price,
+                image_url: imageUrl,
+                specs: product.specs_json,
+                category: product.category_name,
+                stock: product.stock
+            };
+        });
 
         res.json(products);
     } catch (err) {
@@ -76,16 +83,23 @@ router.get('/search', async (req, res) => {
 
     try {
         const result = await request.query(query);
-        const products = result.recordset.map(product => ({
-            id: product.product_id,
-            name: product.product_name,
-            brand: product.brand,
-            price: product.unit_price,
-            image_url: product.image_url,
-            specs: product.specs_json,
-            category: product.category_name,
-            stock: product.stock
-        }));
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const products = result.recordset.map(product => {
+            const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
+                ? `${baseUrl}${product.image_url}`
+                : product.image_url;
+
+            return {
+                id: product.product_id,
+                name: product.product_name,
+                brand: product.brand,
+                price: product.unit_price,
+                image_url: imageUrl,
+                specs: product.specs_json,
+                category: product.category_name,
+                stock: product.stock
+            };
+        });
         res.json(products);
     } catch (err) {
         console.error('Customer product search error:', err);

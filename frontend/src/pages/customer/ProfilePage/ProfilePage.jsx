@@ -25,6 +25,13 @@ const ProfilePage = () => {
                     default_address: data.default_address || '',
                     password: ''
                 });
+                localStorage.setItem('customerUser', JSON.stringify({
+                    name: data.username || '',
+                    email: data.email || '',
+                    phone_number: data.phone_number || '',
+                    default_address: data.default_address || '',
+                    role_name: data.role_name || 'Customer'
+                }));
             } catch (err) {
                 setError(err.message || 'Không thể tải thông tin hồ sơ.');
             } finally {
@@ -54,7 +61,15 @@ const ProfilePage = () => {
                 password: form.password
             });
             setMessage(updated.message || 'Cập nhật hồ sơ thành công');
-            setProfile({ ...profile, username: form.name, phone_number: form.phone_number, default_address: form.default_address });
+            const updatedProfile = { ...profile, username: form.name, phone_number: form.phone_number, default_address: form.default_address };
+            setProfile(updatedProfile);
+            localStorage.setItem('customerUser', JSON.stringify({
+                name: form.name,
+                email: form.email,
+                phone_number: form.phone_number,
+                default_address: form.default_address,
+                role_name: updatedProfile.role_name || 'Customer'
+            }));
             setForm(prev => ({ ...prev, password: '' }));
         } catch (err) {
             setError(err.message || 'Lỗi khi lưu hồ sơ.');

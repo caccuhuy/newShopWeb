@@ -13,10 +13,22 @@ const CheckoutPage = () => {
     const navigate = useNavigate();
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
     
+    // Get profile data from localStorage
+    const getProfileData = () => {
+        try {
+            const stored = localStorage.getItem('customerUser');
+            return stored ? JSON.parse(stored) : {};
+        } catch {
+            return {};
+        }
+    };
+    
+    const profileData = getProfileData();
+    
     const [formData, setFormData] = useState({
-        name: user?.name || '',
-        phone: '',
-        address: '',
+        name: profileData.name || user?.name || '',
+        phone: profileData.phone_number || '',
+        address: profileData.default_address || '',
     });
     const [loading, setLoading] = useState(false);
 

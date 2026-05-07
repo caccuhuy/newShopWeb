@@ -31,6 +31,7 @@ function AppRoutes() {
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CheckoutPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/categories/:categoryName" element={<CategoriesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/login" element={<CustomerLogin />} />
         

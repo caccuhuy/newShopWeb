@@ -65,6 +65,23 @@ export const apiService = {
         return await response.json();
     },
 
+    searchProducts: async (query = '', category = '', brand = '', minPrice = '', maxPrice = '') => {
+        const params = new URLSearchParams();
+        if (query) params.append('q', query);
+        if (category) params.append('category', category);
+        if (brand) params.append('brand', brand);
+        if (minPrice) params.append('minPrice', minPrice);
+        if (maxPrice) params.append('maxPrice', maxPrice);
+        
+        const response = await fetch(`${BASE_URL}/customer-products/search?${params}`);
+        if (!response.ok) throw new Error('Lỗi tìm kiếm sản phẩm');
+        return await response.json();
+    },
+
+    getProductsByCategory: async (categoryName) => {
+        return await apiService.searchProducts('', categoryName);
+    },
+
     getProductById: async (id) => {
         const response = await fetch(`${BASE_URL}/products/${id}`);
         if (!response.ok) throw new Error('Sản phẩm không tồn tại');

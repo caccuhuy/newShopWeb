@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const product = await fetchData(`/products/${productId}`);
         
         // Update UI Elements
-        document.title = `${product.name} | ArchitectLedger`;
+        document.title = `${product.name} |Shop`;
         document.getElementById('productName').textContent = product.name;
         document.getElementById('brandLabel').textContent = product.brand;
         document.getElementById('productPrice').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price);

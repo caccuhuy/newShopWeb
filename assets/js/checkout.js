@@ -2,6 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartContainer = document.getElementById('cartItemsList');
     const totalDisplay = document.getElementById('finalTotal');
     const checkoutBtn = document.getElementById('confirmCheckout');
+    const custNameInput = document.getElementById('custName');
+    const custPhoneInput = document.getElementById('custPhone');
+    const custAddressInput = document.getElementById('custAddress');
+
+    const fillProfileInfo = () => {
+        const profileData = JSON.parse(localStorage.getItem('customerUser')) || {};
+        if (custNameInput && (profileData.name || profileData.username)) {
+            custNameInput.value = profileData.name || profileData.username;
+        }
+        if (custPhoneInput && (profileData.phone || profileData.phone_number)) {
+            custPhoneInput.value = profileData.phone || profileData.phone_number;
+        }
+        if (custAddressInput && (profileData.address || profileData.default_address)) {
+            custAddressInput.value = profileData.address || profileData.default_address;
+        }
+    };
 
     const renderCart = () => {
         const cart = CartManager.getCart();
@@ -52,11 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
     window.handleUpdateQty = (id, delta) => CartManager.updateQuantity(id, delta);
 
     // Initial load
+    fillProfileInfo();
     let currentTotal = renderCart();
 
     // Listen for updates
     window.addEventListener('cartUpdated', () => {
         currentTotal = renderCart();
+    });
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'customerUser') {
+            fillProfileInfo();
+        }
     });
 
     // Handle Checkout Action

@@ -127,9 +127,9 @@ const OrderManagementPage = () => {
 
     const filteredOrders = orders.filter(order => {
         const matchesSearch = 
-            order.customer_info?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customer_info?.phone?.includes(searchTerm) ||
-            order.id.toString().includes(searchTerm);
+            (order.customer_info?.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+            (order.customer_info?.phone || '').includes(searchTerm) ||
+            (order.id || '').toString().includes(searchTerm);
         const matchesStatus = filterStatus === '' || order.status === filterStatus;
         return matchesSearch && matchesStatus;
     });

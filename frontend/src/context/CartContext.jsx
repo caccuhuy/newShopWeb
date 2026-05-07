@@ -9,6 +9,8 @@ export const CartProvider = ({ children }) => {
         const savedCart = localStorage.getItem('cart');
         return savedCart ? JSON.parse(savedCart) : [];
     });
+    const [lastAddedItem, setLastAddedItem] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -39,6 +41,9 @@ export const CartProvider = ({ children }) => {
             }
             return [...prevCart, { ...normalizedProduct, quantity }];
         });
+        
+        setLastAddedItem(normalizedProduct);
+        setShowSuccessModal(true);
     };
 
     const removeFromCart = (productId) => {
@@ -72,7 +77,10 @@ export const CartProvider = ({ children }) => {
             updateQuantity, 
             clearCart, 
             cartCount, 
-            cartTotal 
+            cartTotal,
+            lastAddedItem,
+            showSuccessModal,
+            setShowSuccessModal
         }}>
             {children}
         </CartContext.Provider>

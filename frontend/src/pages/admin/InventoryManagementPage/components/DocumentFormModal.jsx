@@ -188,7 +188,7 @@ const DocumentFormModal = ({ isOpen, onClose, onSuccess, initialDocId = null }) 
     };
 
     const filteredProducts = allProducts.filter(p => {
-        const matchesSearch = p.product_name.toLowerCase().includes(productSearch.toLowerCase());
+        const matchesSearch = (p.name || '').toLowerCase().includes((productSearch || '').toLowerCase());
         const matchesBrand = !selectedBrand || p.brand === selectedBrand;
         return matchesSearch && matchesBrand;
     }).slice(0, 10);
@@ -205,7 +205,7 @@ const DocumentFormModal = ({ isOpen, onClose, onSuccess, initialDocId = null }) 
             newItems.push({
                 serial_number: serial,
                 product_id: productId,
-                product_name: product.product_name,
+                product_name: product.name,
                 unit_price: product.price || 0
             });
         }
@@ -364,7 +364,7 @@ const DocumentFormModal = ({ isOpen, onClose, onSuccess, initialDocId = null }) 
                                             display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                                         }}>
                                             <div style={{overflow: 'hidden'}}>
-                                                <div style={{fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{p.product_name}</div>
+                                                <div style={{fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{p.name}</div>
                                                 <div style={{fontSize: '0.75rem', color: '#64748b'}}>{p.brand} | {p.category}</div>
                                             </div>
                                             <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>

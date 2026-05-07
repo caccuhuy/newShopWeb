@@ -69,8 +69,8 @@ const SupplierManagementPage = () => {
     };
 
     const filtered = suppliers.filter(s => 
-        s.supplier_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.tax_id.toLowerCase().includes(searchTerm.toLowerCase())
+        (s.supplier_name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (s.tax_id || '').toLowerCase().includes((searchTerm || '').toLowerCase())
     );
 
     return (

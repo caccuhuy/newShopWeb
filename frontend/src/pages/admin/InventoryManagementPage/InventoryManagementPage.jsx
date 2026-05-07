@@ -41,7 +41,7 @@ const InventoryManagementPage = () => {
     const filteredDocs = docs.filter(doc => {
         const matchesType = typeFilter === '' || doc.doc_type.toString() === typeFilter;
         const matchesStatus = statusFilter === '' || doc.status.toString() === statusFilter;
-        const matchesSearch = doc.doc_id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        const matchesSearch = (doc.doc_id || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
                              (doc.created_by && doc.created_by.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesType && matchesStatus && matchesSearch;
     });

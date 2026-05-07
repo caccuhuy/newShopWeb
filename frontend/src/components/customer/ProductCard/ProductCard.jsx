@@ -9,7 +9,6 @@ const ProductCard = ({ product }) => {
     const handleAddToCart = (e) => {
         e.stopPropagation();
         addToCart(product);
-        alert(`Đã thêm ${product.name} vào giỏ hàng!`);
     };
 
     return (

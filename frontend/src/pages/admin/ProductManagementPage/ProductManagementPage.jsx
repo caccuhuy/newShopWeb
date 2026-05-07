@@ -58,9 +58,9 @@ const ProductManagementPage = () => {
     const handleEditProduct = (product) => {
         setEditingProduct(product);
         setProductForm({
-            product_name: product.product_name,
+            product_name: product.name,
             cat_id: product.cat_id,
-            unit_price: product.unit_price,
+            unit_price: product.price,
             brand: product.brand,
             warranty_period: product.warranty_period,
             specs_json: product.specs_json || '{}'
@@ -102,7 +102,7 @@ const ProductManagementPage = () => {
 
         try {
             if (editingProduct) {
-                await apiService.updateProduct(editingProduct.product_id, formData);
+                await apiService.updateProduct(editingProduct.id, formData);
             } else {
                 await apiService.addProduct(formData);
             }
@@ -164,15 +164,15 @@ const ProductManagementPage = () => {
 
     // Filtering Logic
     const filteredProducts = products.filter(p => {
-        const matchesSearch = p.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             p.brand.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = filterCategory === '' || p.cat_id.toString() === filterCategory;
+        const matchesSearch = (p.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+                             (p.brand || '').toLowerCase().includes((searchTerm || '').toLowerCase());
+        const matchesCategory = filterCategory === '' || p.cat_id?.toString() === filterCategory;
         const matchesBrand = filterBrand === '' || p.brand === filterBrand;
         return matchesSearch && matchesCategory && matchesBrand;
     });
 
     const filteredCategories = categories.filter(cat => 
-        cat.cat_name.toLowerCase().includes(searchTerm.toLowerCase())
+        (cat.cat_name || '').toLowerCase().includes((searchTerm || '').toLowerCase())
     );
 
     // Spec Handling
@@ -310,19 +310,19 @@ const ProductManagementPage = () => {
                             </thead>
                             <tbody>
                                 {filteredProducts.map(p => (
-                                    <tr key={p.product_id}>
+                                    <tr key={p.id}>
                                         <td>
                                             <div className={styles.imgBox}>
                                                 {p.image_url ? (
-                                                    <img src={`http://localhost:5000${p.image_url}`} alt={p.product_name} />
+                                                    <img src={p.image_url} alt={p.name} />
                                                 ) : (
                                                     <ImageIcon size={20} className={styles.placeholderIcon} />
                                                 )}
                                             </div>
                                         </td>
-                                        <td><span className={styles.textBold}>{p.product_name}</span></td>
-                                        <td><span className={styles.categoryBadge}>{p.category_name}</span></td>
-                                        <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.unit_price)}</td>
+                                        <td><span className={styles.textBold}>{p.name}</span></td>
+                                        <td><span className={styles.categoryBadge}>{p.category}</span></td>
+                                        <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}</td>
                                         <td>
                                             <span className={clsx(
                                                 styles.stockValue,
@@ -336,7 +336,7 @@ const ProductManagementPage = () => {
                                         <td>
                                             <div className={styles.actions}>
                                                 <button className={styles.editBtn} onClick={() => handleEditProduct(p)}><Edit size={14} /></button>
-                                                <button className={styles.deleteBtn} onClick={() => deleteProduct(p.product_id)}><Trash2 size={14} /></button>
+                                                <button className={styles.deleteBtn} onClick={() => deleteProduct(p.id)}><Trash2 size={14} /></button>
                                             </div>
                                         </td>
                                     </tr>

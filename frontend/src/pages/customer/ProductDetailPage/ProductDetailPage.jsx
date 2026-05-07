@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../../components/common/Header/Header';
 import { apiService } from '../../../services/apiService';
 import { useCart } from '../../../context/CartContext';
-import AlertModal from '../../../components/common/Modal/AlertModal';
 import styles from './ProductDetailPage.module.css';
 
 const ProductDetailPage = () => {
@@ -13,7 +12,6 @@ const ProductDetailPage = () => {
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [alertOpen, setAlertOpen] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -102,7 +100,6 @@ const ProductDetailPage = () => {
                                 className={styles.addBtn}
                                 onClick={() => {
                                     addToCart(product, quantity);
-                                    setAlertOpen(true);
                                 }}
                             >
                                 Thêm vào giỏ hàng
@@ -132,14 +129,6 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
             </main>
-
-            <AlertModal 
-                isOpen={alertOpen}
-                onClose={() => setAlertOpen(false)}
-                type="success"
-                title="Giỏ hàng"
-                message={`Đã thêm ${quantity} ${product.name} vào giỏ hàng thành công!`}
-            />
         </div>
     );
 };

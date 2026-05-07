@@ -121,8 +121,8 @@ const StaffManagementPage = () => {
     };
 
     const filteredStaffList = staffList.filter(staff => 
-        staff.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        staff.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (staff.username || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (staff.email || '').toLowerCase().includes((searchTerm || '').toLowerCase())
     );
 
     if (!isAdmin) return null;

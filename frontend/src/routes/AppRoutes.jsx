@@ -15,10 +15,19 @@ import ProductManagementPage from '../pages/admin/ProductManagementPage/ProductM
 import SupplierManagementPage from '../pages/admin/SupplierManagementPage/SupplierManagementPage';
 import InventoryManagementPage from '../pages/admin/InventoryManagementPage/InventoryManagementPage.jsx';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { useCart } from '../context/CartContext';
+import CartSuccessModal from '../components/customer/CartSuccessModal/CartSuccessModal';
 
 function AppRoutes() {
+  const { showSuccessModal, setShowSuccessModal, lastAddedItem } = useCart();
+
   return (
     <Router>
+      <CartSuccessModal 
+        isOpen={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)} 
+        product={lastAddedItem}
+      />
       <Routes>
         <Route path="/admin/inventory-test" element={<div>Inventory Test Page</div>} />
         <Route path="/admin/inventory" element={

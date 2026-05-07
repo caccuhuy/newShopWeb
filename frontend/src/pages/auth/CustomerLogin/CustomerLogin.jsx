@@ -53,7 +53,7 @@ const CustomerLogin = () => {
                 </h1>
                 <p className={styles.subtitle}>
                     {mode === 'register' 
-                        ? 'Tham gia cùng cộng đồng mua sắm ArchitectLedger' 
+                        ? 'Tham gia cùng cộng đồng mua sắmShop' 
                         : 'Đăng nhập vào tài khoản khách hàng của bạn'}
                 </p>
                 

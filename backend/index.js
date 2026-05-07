@@ -15,22 +15,28 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 const productRoutes = require('./routes/products');
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/orders');
+const customerOrdersRoutes = require('./routes/customerOrders');
+const customersRoutes = require('./routes/customers');
 const staffRoutes = require('./routes/staff');
 const analyticsRoutes = require('./routes/analytics');
 const categoriesRoutes = require('./routes/categories');
 const suppliersRoutes = require('./routes/suppliers');
 const inventoryRoutes = require('./routes/inventory');
 const logsRoutes = require('./routes/logs');
+const customerProductsRoutes = require('./routes/customerProducts');
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/customer-orders', customerOrdersRoutes);
+app.use('/api/customers', customersRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/suppliers', suppliersRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/customer-products', customerProductsRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

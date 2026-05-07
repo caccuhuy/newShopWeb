@@ -38,11 +38,48 @@ export const apiService = {
         return data;
     },
 
+    getCustomerProfile: async () => {
+        const response = await fetch(`${BASE_URL}/customers/profile`, {
+            headers: getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || data.error || 'Lỗi lấy thông tin hồ sơ');
+        return data;
+    },
+
+    updateCustomerProfile: async (profileData) => {
+        const response = await fetch(`${BASE_URL}/customers/profile`, {
+            method: 'PUT',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(profileData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || data.error || 'Lỗi cập nhật hồ sơ');
+        return data;
+    },
+
     // Products (Real API)
     getProducts: async () => {
         const response = await fetch(`${BASE_URL}/products`);
         if (!response.ok) throw new Error('Lỗi lấy danh sách sản phẩm');
         return await response.json();
+    },
+
+    searchProducts: async (query = '', category = '', brand = '', minPrice = '', maxPrice = '') => {
+        const params = new URLSearchParams();
+        if (query) params.append('q', query);
+        if (category) params.append('category', category);
+        if (brand) params.append('brand', brand);
+        if (minPrice) params.append('minPrice', minPrice);
+        if (maxPrice) params.append('maxPrice', maxPrice);
+        
+        const response = await fetch(`${BASE_URL}/customer-products/search?${params}`);
+        if (!response.ok) throw new Error('Lỗi tìm kiếm sản phẩm');
+        return await response.json();
+    },
+
+    getProductsByCategory: async (categoryName) => {
+        return await apiService.searchProducts('', categoryName);
     },
 
     getProductById: async (id) => {
@@ -237,6 +274,17 @@ export const apiService = {
         });
         if (!response.ok) throw new Error('Không tìm thấy đơn hàng');
         return await response.json();
+    },
+
+    createOrder: async (orderData) => {
+        const response = await fetch(`${BASE_URL}/customer-orders`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || data.error || 'Lỗi tạo đơn hàng');
+        return data;
     },
 
     checkOrderStock: async (id) => {

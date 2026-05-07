@@ -43,13 +43,34 @@ newShopWeb/
   JWT_SECRET=super_secret_key_for_jwt_token_123456
   PORT=5000
   ```
-- Chạy server: `npm start` hoặc `node index.js`
+- Chạy backend riêng (nếu cần): `npm start` hoặc `node index.js`
 
-### 3. Cấu hình Frontend
-- Mở một terminal mới và di chuyển vào thư mục frontend: `cd frontend`
-- Cài đặt dependencies: `npm install`
-- Chạy ứng dụng: `npm run dev`
-- Truy cập tại: `http://localhost:5173`
+### 3. Chạy toàn bộ dự án
+- Ở thư mục gốc dự án `newShopWeb`, cài đặt dependencies cho root và cả hai phần frontend/backend:
+  ```bash
+  npm install
+  npm run install-all
+  ```
+- Chạy cả frontend và backend cùng lúc bằng một lệnh:
+  ```bash
+  npm start
+  ```
+- Sau khi chạy, truy cập frontend tại: `http://localhost:5173`
+- Backend mặc định sẽ lắng nghe tại: `http://localhost:5000`
+
+### 4. Chạy riêng từng phần nếu cần
+- Backend riêng:
+  ```bash
+  cd backend
+  npm install
+  npm start
+  ```
+- Frontend riêng:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
 - Trang đăng nhập Admin/Staff: `http://localhost:5173/admin/login`
 
 ## 🔑 Tài khoản thử nghiệm

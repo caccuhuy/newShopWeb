@@ -14,17 +14,30 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
+    const toNumber = (value) => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') {
+            const cleaned = value.replace(/[^\d.-]/g, '');
+            return cleaned ? Number(cleaned) : 0;
+        }
+    };
+
     const addToCart = (product, quantity = 1) => {
+        const normalizedProduct = {
+            ...product,
+            price: toNumber(product.price)
+        };
+
         setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id);
+            const existingItem = prevCart.find(item => item.id === normalizedProduct.id);
             if (existingItem) {
                 return prevCart.map(item =>
-                    item.id === product.id
+                    item.id === normalizedProduct.id
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             }
-            return [...prevCart, { ...product, quantity }];
+            return [...prevCart, { ...normalizedProduct, quantity }];
         });
     };
 
@@ -45,8 +58,11 @@ export const CartProvider = ({ children }) => {
         setCart([]);
     };
 
-    const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const cartCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+    const cartTotal = cart.reduce((total, item) => {
+        const price = toNumber(item.price);
+        return total + (price * (item.quantity || 0));
+    }, 0);
 
     return (
         <CartContext.Provider value={{ 

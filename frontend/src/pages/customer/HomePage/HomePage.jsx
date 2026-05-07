@@ -19,6 +19,7 @@ const HomePage = () => {
                 setProducts(data);
             } catch (error) {
                 console.error('Error fetching products:', error);
+                setProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -74,7 +75,7 @@ const HomePage = () => {
                         </div>
                     ) : (
                         <div className={styles.empty}>
-                            Không tìm thấy sản phẩm nào phù hợp.
+                            {searchQuery ? 'Không tìm thấy sản phẩm nào phù hợp với từ khóa tìm kiếm.' : 'Không có sản phẩm nào.'}
                         </div>
                     )}
                 </div>

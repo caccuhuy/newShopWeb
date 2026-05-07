@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/customer/HomePage/HomePage';
 import ProductDetailPage from '../pages/customer/ProductDetailPage/ProductDetailPage';
 import CheckoutPage from '../pages/customer/CheckoutPage/CheckoutPage';
+import CategoriesPage from '../pages/customer/CategoriesPage/CategoriesPage';
+import ProfilePage from '../pages/customer/ProfilePage/ProfilePage';
 import CustomerLogin from '../pages/auth/CustomerLogin/CustomerLogin';
 import AdminLogin from '../pages/auth/AdminLogin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard/AdminDashboard';
@@ -28,6 +30,9 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CheckoutPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/categories/:categoryName" element={<CategoriesPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/login" element={<CustomerLogin />} />
         
         {/* Admin/Staff Auth */}
@@ -64,6 +69,7 @@ function AppRoutes() {
                 <AdminDashboard />
             </ProtectedRoute>
         } />
+        <Route path="*" element={<HomePage />} />
       </Routes>
     </Router>
   );

@@ -28,7 +28,35 @@ router.get('/', async (req, res) => {
             FROM Product p 
             LEFT JOIN Categories c ON p.cat_id = c.cat_id
         `);
-        res.json(result.recordset);
+
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const products = result.recordset.map(product => {
+            let specs = {};
+            try {
+                specs = product.specs_json ? JSON.parse(product.specs_json) : {};
+            } catch (parseErr) {
+                specs = {};
+            }
+
+            const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
+                ? `${baseUrl}${product.image_url}`
+                : product.image_url;
+
+            return {
+                id: product.product_id,
+                name: product.product_name,
+                brand: product.brand,
+                price: product.unit_price,
+                image_url: imageUrl,
+                specs,
+                category: product.category_name,
+                stock: product.stock,
+                warranty_period: product.warranty_period,
+                description: product.description || ''
+            };
+        });
+
+        res.json(products);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -40,9 +68,39 @@ router.get('/:id', async (req, res) => {
         const pool = await poolPromise;
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query("SELECT * FROM Product WHERE product_id = @id");
+            .query(`
+                SELECT p.*, c.cat_name as category_name,
+                       (SELECT COUNT(*) FROM Stock_Units su WHERE su.product_id = p.product_id AND su.status = 1) as stock
+                FROM Product p
+                LEFT JOIN Categories c ON p.cat_id = c.cat_id
+                WHERE p.product_id = @id
+            `);
         if (result.recordset.length === 0) return res.status(404).json({ message: 'Product not found' });
-        res.json(result.recordset[0]);
+
+        const product = result.recordset[0];
+        let specs = {};
+        try {
+            specs = product.specs_json ? JSON.parse(product.specs_json) : {};
+        } catch (parseErr) {
+            specs = {};
+        }
+
+        const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
+            ? `${req.protocol}://${req.get('host')}${product.image_url}`
+            : product.image_url;
+
+        res.json({
+            id: product.product_id,
+            name: product.product_name,
+            brand: product.brand,
+            price: product.unit_price,
+            image_url: imageUrl,
+            specs,
+            category: product.category_name,
+            stock: product.stock,
+            warranty_period: product.warranty_period,
+            description: product.description || ''
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

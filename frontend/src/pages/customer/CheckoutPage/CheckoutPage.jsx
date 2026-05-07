@@ -13,10 +13,22 @@ const CheckoutPage = () => {
     const navigate = useNavigate();
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
     
+    // Get profile data from localStorage
+    const getProfileData = () => {
+        try {
+            const stored = localStorage.getItem('customerUser');
+            return stored ? JSON.parse(stored) : {};
+        } catch {
+            return {};
+        }
+    };
+    
+    const profileData = getProfileData();
+    
     const [formData, setFormData] = useState({
-        name: user?.name || '',
-        phone: '',
-        address: '',
+        name: profileData.name || user?.name || '',
+        phone: profileData.phone_number || '',
+        address: profileData.default_address || '',
     });
     const [loading, setLoading] = useState(false);
 
@@ -83,7 +95,7 @@ const CheckoutPage = () => {
                                     <div className={styles.itemInfo}>
                                         <span className={styles.itemBrand}>{item.brand}</span>
                                         <h3 className={styles.itemName}>{item.name}</h3>
-                                        <p className={styles.itemPrice}>{item.price.toLocaleString()}đ</p>
+                                        <p className={styles.itemPrice}>{Number(item.price || 0).toLocaleString()}đ</p>
                                         
                                         <div className={styles.itemActions}>
                                             <div className={styles.qtyControls}>
@@ -102,7 +114,7 @@ const CheckoutPage = () => {
                             <h2 className={styles.orderTitle}>Tóm tắt đơn hàng</h2>
                             <div className={styles.summaryRow}>
                                 <span>Tạm tính ({cart.length} món)</span>
-                                <span>{cartTotal.toLocaleString()}đ</span>
+                                <span>{Number(cartTotal || 0).toLocaleString()}đ</span>
                             </div>
                             <div className={styles.summaryRow}>
                                 <span>Phí vận chuyển</span>
@@ -110,7 +122,7 @@ const CheckoutPage = () => {
                             </div>
                             <div className={styles.totalRow}>
                                 <span>Tổng cộng</span>
-                                <span>{cartTotal.toLocaleString()}đ</span>
+                                <span>{Number(cartTotal || 0).toLocaleString()}đ</span>
                             </div>
                             
                             <form className={styles.checkoutForm} onSubmit={handleCheckout}>

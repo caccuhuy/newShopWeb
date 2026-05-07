@@ -7,6 +7,51 @@ const { logActivity } = require('../utils/logger');
 
 const generateOrderId = () => `ORD-${Date.now().toString().slice(-9)}`;
 
+/**
+ * @swagger
+ * tags:
+ *   name: Customer Orders
+ *   description: Quản lý đơn hàng (Khách hàng)
+ */
+
+/**
+ * @swagger
+ * /api/customer-orders:
+ *   post:
+ *     summary: Đặt hàng mới
+ *     tags: [Customer Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - items
+ *               - total_amount
+ *               - shipping_address
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     quantity:
+ *                       type: integer
+ *                     price:
+ *                       type: number
+ *               total_amount:
+ *                 type: number
+ *               shipping_address:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Đơn hàng đã được tạo
+ */
 // Create a new customer order
 router.post('/', verifyToken, isCustomer, async (req, res) => {
     const { items, total_amount, shipping_address } = req.body;
@@ -71,6 +116,18 @@ router.post('/', verifyToken, isCustomer, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/customer-orders/history:
+ *   get:
+ *     summary: Lấy lịch sử đơn hàng của tôi
+ *     tags: [Customer Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Danh sách đơn hàng
+ */
 // Get customer order history
 router.get('/history', verifyToken, isCustomer, async (req, res) => {
     try {
@@ -92,6 +149,24 @@ router.get('/history', verifyToken, isCustomer, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/customer-orders/{id}:
+ *   get:
+ *     summary: Xem chi tiết đơn hàng của tôi
+ *     tags: [Customer Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Chi tiết đơn hàng
+ */
 // Get single order detail for customer
 router.get('/:id', verifyToken, isCustomer, async (req, res) => {
     try {

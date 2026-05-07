@@ -4,6 +4,25 @@ const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isStaff } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Orders
+ *   description: Quản lý đơn hàng (Nhân viên)
+ */
+
+/**
+ * @swagger
+ * /api/orders:
+ *   get:
+ *     summary: Lấy danh sách đơn hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Danh sách đơn hàng
+ */
 // Get all orders (Staff/Admin)
 router.get('/', verifyToken, isStaff, async (req, res) => {
     try {
@@ -37,6 +56,24 @@ router.get('/', verifyToken, isStaff, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/orders/{id}:
+ *   get:
+ *     summary: Lấy chi tiết đơn hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Chi tiết đơn hàng
+ */
 // Get order details
 router.get('/:id', verifyToken, isStaff, async (req, res) => {
     try {
@@ -79,6 +116,24 @@ router.get('/:id', verifyToken, isStaff, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/orders/{id}/check-stock:
+ *   get:
+ *     summary: Kiểm tra tồn kho và lấy số serial khả dụng cho đơn hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Báo cáo tồn kho
+ */
 // Check stock and get available serials for an order
 router.get('/:id/check-stock', verifyToken, isStaff, async (req, res) => {
     try {
@@ -107,6 +162,42 @@ router.get('/:id/check-stock', verifyToken, isStaff, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/orders/{id}/export:
+ *   post:
+ *     summary: Xử lý xuất kho cho đơn hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               serials:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product_id:
+ *                       type: integer
+ *                     serial_number:
+ *                       type: string
+ *                     unit_price:
+ *                       type: number
+ *     responses:
+ *       200:
+ *         description: Đã tạo phiếu xuất kho nháp
+ */
 // Process Order Export (Create DOC and update stock)
 router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
     const orderId = req.params.id;
@@ -178,6 +269,34 @@ router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/orders/{id}/status:
+ *   put:
+ *     summary: Cập nhật trạng thái đơn hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, processing, shipped, completed, cancelled]
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ */
 // Simple status update (e.g. for cancelling)
 router.put('/:id/status', verifyToken, isStaff, async (req, res) => {
     const { status } = req.body;

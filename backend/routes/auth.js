@@ -5,6 +5,41 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 // Login Endpoint
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Đăng nhập hệ thống
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Sai thông tin đăng nhập
+ */
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     
@@ -61,6 +96,41 @@ router.post('/login', async (req, res) => {
 });
 
 // Register Endpoint
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Đăng ký tài khoản khách hàng mới
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *               - fullname
+ *               - email
+ *               - phone
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               fullname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Đăng ký thành công
+ *       400:
+ *         description: Tên đăng nhập đã tồn tại
+ */
 router.post('/register', async (req, res) => {
     const { name, email, password, phone_number, address } = req.body;
 

@@ -4,6 +4,23 @@ const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Suppliers
+ *   description: Quản lý nhà cung cấp
+ */
+
+/**
+ * @swagger
+ * /api/suppliers:
+ *   get:
+ *     summary: Lấy danh sách nhà cung cấp
+ *     tags: [Suppliers]
+ *     responses:
+ *       200:
+ *         description: Danh sách nhà cung cấp
+ */
 // Get all suppliers
 router.get('/', async (req, res) => {
     try {
@@ -15,6 +32,29 @@ router.get('/', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/suppliers:
+ *   post:
+ *     summary: Thêm nhà cung cấp mới (Admin)
+ *     tags: [Suppliers]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tax_id:
+ *                 type: string
+ *               supplier_name:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Tạo thành công
+ */
 // Create supplier (Admin)
 router.post('/', verifyToken, isAdmin, async (req, res) => {
     const { tax_id, supplier_name } = req.body;
@@ -33,6 +73,33 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/suppliers/{tax_id}:
+ *   put:
+ *     summary: Cập nhật nhà cung cấp (Admin)
+ *     tags: [Suppliers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tax_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               supplier_name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ */
 // Update supplier (Admin)
 router.put('/:tax_id', verifyToken, isAdmin, async (req, res) => {
     const { supplier_name } = req.body;
@@ -51,6 +118,26 @@ router.put('/:tax_id', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/suppliers/{tax_id}:
+ *   delete:
+ *     summary: Xóa nhà cung cấp (Admin)
+ *     tags: [Suppliers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tax_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Xóa thành công
+ *       400:
+ *         description: Nhà cung cấp đã có lịch sử kho
+ */
 // Delete supplier (Admin)
 router.delete('/:tax_id', verifyToken, isAdmin, async (req, res) => {
     try {

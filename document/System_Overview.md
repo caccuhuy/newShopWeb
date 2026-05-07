@@ -62,7 +62,7 @@ Hệ thống quản lý thông qua các thực thể cốt lõi sau:
 
 ---
 
-## 5. Các Chức Năng Cốt Lõi (Core Use Cases)
+## 5. Các Chức Năng Cốt Lõi (Core Use Cases)`
 
 ### Nhóm chức năng của Khách hàng (Customer)
 | Tên chức năng | Mô tả |

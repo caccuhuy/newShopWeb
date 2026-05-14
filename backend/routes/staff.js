@@ -27,8 +27,8 @@ const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 router.get('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
-        const result = await pool.request()
-            .query("SELECT user_id, username, email, phone_number, role_name, is_active FROM Users WHERE role_name IN ('Staff', 'Admin')");
+        const result = await pool.request().execute('vw_GetAllStaffs');
+            
         res.json(result.recordset);
     } catch (err) {
         console.error('Error fetching staff:', err);
@@ -80,36 +80,11 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
         
-        // 1. Check if email exists
-        const checkEmail = await pool.request()
-            .input('email', sql.VarChar, email)
-            .query('SELECT 1 FROM Users WHERE email = @email');
-            
-        if (checkEmail.recordset.length > 0) {
-            return res.status(400).json({ message: 'Email này đã tồn tại trong hệ thống!' });
-        }
 
-        // 1b. Check if phone number exists
-        const checkPhone = await pool.request()
-            .input('phone_number', sql.Char, phone_number)
-            .query('SELECT 1 FROM Users WHERE phone_number = @phone_number');
-            
-        if (checkPhone.recordset.length > 0) {
-            return res.status(400).json({ message: 'Số điện thoại này đã tồn tại trong hệ thống!' });
-        }
-
-        // 2. Generate user_id
-        const idResult = await pool.request().query('SELECT MAX(CAST(user_id AS INT)) as maxId FROM Users');
-        let nextIdNum = 1;
-        if (idResult.recordset[0].maxId != null) {
-            nextIdNum = idResult.recordset[0].maxId + 1;
-        }
-        const newUserId = nextIdNum.toString().padStart(4, '0');
-
-        // 3. Hash default password '123456'
+        // Hash default password '123456'
         const hash = crypto.createHash('sha256').update('123456').digest('hex');
 
-        // 4. Insert
+        // Insert
         await pool.request()
             .input('user_id', sql.VarChar, newUserId)
             .input('username', sql.NVarChar, name)
@@ -117,11 +92,9 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
             .input('email', sql.VarChar, email)
             .input('phone_number', sql.Char, phone_number)
             .input('role_name', sql.VarChar, role)
-            .query(`
-                INSERT INTO Users (user_id, username, pasword_hash, email, phone_number, role_name, is_active)
-                VALUES (@user_id, @username, @pasword_hash, @email, @phone_number, @role_name, 1)
-            `);
-
+            .execute('sp_AddStaff');
+            
+        await logActivity(req.user.id, `Tạo tài khoản mới: ${newUserId} (${name})`, 'success');
         res.status(201).json({ message: 'Thêm nhân viên thành công' });
     } catch (err) {
         console.error('Error creating staff:', err);
@@ -158,25 +131,22 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
  */
 // Toggle staff status
 router.put('/:id/status', verifyToken, isAdmin, async (req, res) => {
-    const { id } = req.params;
     const { is_active } = req.body;
+    const targetId = req.params.id;
+    const adminId = req.user.id;
 
     try {
         const pool = await poolPromise;
+        const result = await pool.request()
+            .input('targetId', sql.VarChar, targetId)
+            .input('adminId', sql.VarChar, adminId)
+            .input('isActive', sql.Bit, is_active)
+            .execute('sp_ToggleUserActive');
 
-        // Prevent self-lock
-        const userCheck = await pool.request()
-            .input('user_id', sql.VarChar, id)
-            .query('SELECT email FROM Users WHERE user_id = @user_id');
-            
-        if (userCheck.recordset.length > 0 && userCheck.recordset[0].email === req.user.email) {
-            return res.status(400).json({ message: 'Bạn không thể tự khóa tài khoản của chính mình!' });
-        }
+        const { username } = result.recordset[0];
+        const action = is_active ? 'Mở khóa' : 'Khóa';
 
-        await pool.request()
-            .input('user_id', sql.VarChar, id)
-            .input('is_active', sql.Bit, is_active)
-            .query('UPDATE Users SET is_active = @is_active WHERE user_id = @user_id');
+        await logActivity(adminId, `${action} tài khoản: ${username} (ID: ${targetId})`, is_active ? 'success' : 'warning');
 
         res.json({ message: 'Cập nhật trạng thái thành công' });
     } catch (err) {
@@ -226,7 +196,7 @@ router.put('/:id/reset-password', verifyToken, isAdmin, async (req, res) => {
         await pool.request()
             .input('user_id', sql.VarChar, id)
             .input('hash', sql.VarChar, hash)
-            .query('UPDATE Users SET pasword_hash = @hash WHERE user_id = @user_id');
+            .execute('sp_ResetPassword');
 
         res.json({ message: 'Reset mật khẩu thành công' });
     } catch (err) {

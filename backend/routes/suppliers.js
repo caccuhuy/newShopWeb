@@ -25,7 +25,7 @@ const { logActivity } = require('../utils/logger');
 router.get('/', async (req, res) => {
     try {
         const pool = await poolPromise;
-        const result = await pool.request().query("SELECT tax_id, supplier_name FROM Suppliers");
+        const result = await pool.request().execute('vw_Suppliers');
         res.json(result.recordset);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -61,9 +61,9 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
         await pool.request()
-            .input('tax', sql.VarChar, tax_id)
+            .input('tax', sql.Char(10), tax_id)
             .input('name', sql.NVarChar, supplier_name)
-            .query("INSERT INTO Suppliers (tax_id, supplier_name) VALUES (@tax, @name)");
+            .execute('sp_AddSupplier');
         
         await logActivity(req.user.id, `Thêm nhà cung cấp mới: ${supplier_name} (MST: ${tax_id})`, 'success');
 
@@ -106,9 +106,9 @@ router.put('/:tax_id', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
         await pool.request()
-            .input('tax', sql.VarChar, req.params.tax_id)
+            .input('tax', sql.Char(10), req.params.tax_id)
             .input('name', sql.NVarChar, supplier_name)
-            .query("UPDATE Suppliers SET supplier_name = @name WHERE tax_id = @tax");
+            .execute('sp_UpdateSupplier');
         
         await logActivity(req.user.id, `Cập nhật thông tin nhà cung cấp: ${supplier_name} (MST: ${req.params.tax_id})`, 'info');
 
@@ -143,19 +143,11 @@ router.delete('/:tax_id', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
         
-        // Check if supplier is in use in Inventory_DOCs
-        const check = await pool.request()
-            .input('tax', sql.VarChar, req.params.tax_id)
-            .query("SELECT COUNT(*) as count FROM Inventory_DOCs WHERE Suppliers_tax_id = @tax");
-        
-        if (check.recordset[0].count > 0) {
-            return res.status(400).json({ error: 'Không thể xóa nhà cung cấp đã có lịch sử nhập/xuất kho.' });
-        }
-
         await pool.request()
-            .input('tax', sql.VarChar, req.params.tax_id)
-            .query("DELETE FROM Suppliers WHERE tax_id = @tax");
-        
+            .input('tax', sql.Char(10), req.params.tax_id)
+            .execute('sp_DeleteSupplier');
+
+        // Ghi log hoạt động sau khi xóa thành công
         await logActivity(req.user.id, `Xóa nhà cung cấp (MST: ${req.params.tax_id})`, 'danger');
 
         res.json({ message: 'Supplier deleted' });

@@ -60,7 +60,7 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
         const pool = await poolPromise;
         await pool.request()
             .input('name', sql.NVarChar, cat_name)
-            .query("INSERT INTO Categories (cat_name) VALUES (@name)");
+            .execute('sp_AddCategories');
         
         await logActivity(req.user.id, `Thêm danh mục mới: ${cat_name}`, 'success');
 
@@ -105,7 +105,7 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
         await pool.request()
             .input('id', sql.Int, req.params.id)
             .input('name', sql.NVarChar, cat_name)
-            .query("UPDATE Categories SET cat_name = @name WHERE cat_id = @id");
+            .execute('sp_AlterCategories');
         
         await logActivity(req.user.id, `Cập nhật tên danh mục thành: ${cat_name} (ID: ${req.params.id})`, 'info');
 
@@ -140,18 +140,9 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
         
-        // Check if any products belong to this category
-        const check = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query("SELECT COUNT(*) as count FROM Product WHERE cat_id = @id");
-        
-        if (check.recordset[0].count > 0) {
-            return res.status(400).json({ error: 'Không thể xóa danh mục đang có sản phẩm. Vui lòng xóa sản phẩm trước.' });
-        }
-
         await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query("DELETE FROM Categories WHERE cat_id = @id");
+            .execute('sp_DeleteCategories');
         
         await logActivity(req.user.id, `Xóa danh mục (ID: ${req.params.id})`, 'danger');
 

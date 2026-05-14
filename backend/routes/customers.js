@@ -31,11 +31,12 @@ router.get('/profile', verifyToken, isCustomer, async (req, res) => {
         const pool = await poolPromise;
         const result = await pool.request()
             .input('userId', sql.VarChar, req.user.id)
-            .query(`
-                SELECT user_id, username, email, phone_number, default_address, role_name, is_active
-                FROM Users
-                WHERE user_id = @userId
-            `);
+            .execute('sp_GetUserProfile');
+            // query(`
+            //     SELECT user_id, username, email, phone_number, default_address, role_name, is_active
+            //     FROM Users
+            //     WHERE user_id = @userId
+            // `);
 
         if (result.recordset.length === 0) {
             return res.status(404).json({ message: 'Không tìm thấy thông tin khách hàng' });
@@ -91,28 +92,13 @@ router.put('/profile', verifyToken, isCustomer, async (req, res) => {
             .input('phone', sql.Char, phone_number)
             .input('address', sql.NVarChar, default_address);
 
-        let updateQuery = `
-            UPDATE Users
-            SET username = @username,
-                phone_number = @phone,
-                default_address = @address
-            WHERE user_id = @userId
-        `;
 
         if (password) {
             const hash = crypto.createHash('sha256').update(password).digest('hex');
             updateRequest.input('passwordHash', sql.VarChar, hash);
-            updateQuery = `
-                UPDATE Users
-                SET username = @username,
-                    phone_number = @phone,
-                    default_address = @address,
-                    pasword_hash = @passwordHash
-                WHERE user_id = @userId
-            `;
         }
 
-        await updateRequest.query(updateQuery);
+        await updateRequest.execute('sp_UpdateUserProfile');
 
         await logActivity(req.user.id, 'Cập nhật hồ sơ khách hàng', 'info');
         res.json({ message: 'Cập nhật hồ sơ thành công' });

@@ -26,12 +26,8 @@ const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 router.get('/', verifyToken, isAdmin, async (req, res) => {
     try {
         const pool = await poolPromise;
-        const result = await pool.request().query(`
-            SELECT l.*, u.username as [user], u.email
-            FROM ActivityLogs l
-            LEFT JOIN Users u ON TRIM(l.user_id) = TRIM(u.user_id)
-            ORDER BY l.timestamp DESC
-        `);
+        const result = await pool.request().execute('vw_ActivityLog');
+       
         console.log(`Fetched ${result.recordset.length} logs from DB`);
         res.json(result.recordset);
     } catch (err) {
@@ -75,7 +71,7 @@ router.post('/', verifyToken, async (req, res) => {
             .input('user_id', sql.VarChar, userId)
             .input('action', sql.NVarChar, action)
             .input('type', sql.VarChar, type || 'info')
-            .query('INSERT INTO ActivityLogs (user_id, action, type) VALUES (@user_id, @action, @type)');
+            .execute('sp_Log');
         res.status(201).json({ message: 'Log added successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });

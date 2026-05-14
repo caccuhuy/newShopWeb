@@ -27,14 +27,7 @@ const { logActivity } = require('../utils/logger');
 router.get('/', verifyToken, isStaff, async (req, res) => {
     try {
         const pool = await poolPromise;
-        const result = await pool.request().query(`
-            SELECT o.*, u.username as customer_name, u.phone_number as customer_phone,
-                   (SELECT COUNT(*) FROM Order_Details od WHERE od.order_id = o.order_id) as item_count
-            FROM Orders o
-            LEFT JOIN Users u ON o.user_id = u.user_id
-            ORDER BY o.created_at DESC
-        `);
-        
+        const result = await pool.request().execute('vw_AllOrders');
         // Map data to match frontend expectations if necessary
         const orders = result.recordset.map(order => ({
             id: order.order_id,
@@ -80,37 +73,27 @@ router.get('/:id', verifyToken, isStaff, async (req, res) => {
         const pool = await poolPromise;
         const orderResult = await pool.request()
             .input('id', sql.VarChar, req.params.id)
-            .query("SELECT o.*, u.username, u.phone_number FROM Orders o LEFT JOIN Users u ON o.user_id = u.user_id WHERE o.order_id = @id");
+            .execute('sp_GetOrderAdminDetail');
+        // query("SELECT o.*, u.username, u.phone_number FROM Orders o LEFT JOIN Users u ON o.user_id = u.user_id WHERE o.order_id = @id");
             
-        if (orderResult.recordset.length === 0) return res.status(404).json({ message: 'Order not found' });
+        if (orderResult.recordset[0]=== 0|| !orderResult.recordset[0]['']) return res.status(404).json({ message: 'Order not found' });
 
-        const detailsResult = await pool.request()
-            .input('id', sql.VarChar, req.params.id)
-            .query(`
-                SELECT od.*, p.product_name, p.image_url,
-                       (SELECT STRING_AGG(dd.serial_number, ', ') 
-                        FROM DOC_Details dd 
-                        JOIN Inventory_DOCs idoc ON dd.doc_id = idoc.doc_id 
-                        WHERE idoc.order_ref = od.order_id AND dd.product_id = od.product_id) as serials
-                FROM Order_Details od 
-                JOIN Product p ON od.product_id = p.product_id 
-                WHERE od.order_id = @id
-            `);
+        // Parse chuỗi JSON duy nhất trả về từ SQL
+        const orderData = JSON.parse(orderResult.recordset[0]['']);
 
-        const order = orderResult.recordset[0];
-        res.json({
-            ...order,
-            id: order.order_id,
-            customer_info: {
-                name: order.username || 'Khách vãng lai',
-                phone: order.phone_number || 'N/A'
-            },
-            items: detailsResult.recordset.map(item => ({
-                ...item,
-                price_at_time: item.unit_price, // Map unit_price to price_at_time for frontend compatibility
-                serials: item.serials ? item.serials.split(', ') : []
-            }))
-        });
+        // Hậu xử lý nhẹ cho mảng serials nếu SQL trả về dạng chuỗi
+        if (orderData.items) {
+            orderData.items.forEach(item => {
+                if (typeof item.serials_raw === 'string') {
+                    item.serials = JSON.parse('[' + item.serials_raw + ']');
+                } else {
+                    item.serials = [];
+                }
+                delete item.serials_raw;
+            });
+        }
+
+        res.json(orderData);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -140,22 +123,22 @@ router.get('/:id/check-stock', verifyToken, isStaff, async (req, res) => {
         const pool = await poolPromise;
         const itemsResult = await pool.request()
             .input('id', sql.VarChar, req.params.id)
-            .query("SELECT product_id, quantity FROM Order_Details WHERE order_id = @id");
+            .execute('sp_GetOrderStockReport');
 
-        const stockReport = [];
-        for (const item of itemsResult.recordset) {
-            const serialsResult = await pool.request()
-                .input('pid', sql.Int, item.product_id)
-                .query("SELECT serial_number FROM Stock_Units WHERE product_id = @pid AND status = 1");
-            
-            stockReport.push({
-                product_id: item.product_id,
-                required: item.quantity,
-                available: serialsResult.recordset.length,
-                available_serials: serialsResult.recordset.map(s => s.serial_number)
-            });
+        if (!itemsResult.recordset[0] || !itemsResult.recordset[0]['']) {
+            return res.json([]);
         }
-        
+
+        // SQL Server trả về chuỗi JSON, ta parse nó
+        let stockReport = JSON.parse(itemsResult.recordset[0]['']);
+
+        // Chuyển đổi định dạng mảng serials từ [{serial_number: "SN1"}] thành ["SN1"] 
+        stockReport = stockReport.map(item => ({
+            ...item,
+            available_serials: item.available_serials_raw 
+                ? item.available_serials_raw.map(s => s.serial_number) 
+                : []
+        }));
         res.json(stockReport);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -208,6 +191,16 @@ router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
     console.log(`Starting export for Order: ${orderId}, User: ${staffId}, Serials: ${serials.length}`);
 
     const transaction = new sql.Transaction(await poolPromise);
+
+    const detailTable = new sql.Table('StockItemType');
+        detailTable.columns.add('product_id', sql.Int);
+        detailTable.columns.add('serial_number', sql.VarChar(50));
+        detailTable.columns.add('unit_price', sql.Decimal(18, 2));
+
+        serials.forEach(item => {
+            detailTable.rows.add(item.product_id, item.serial_number, item.unit_price);
+        });
+
     try {
         await transaction.begin();
         
@@ -215,40 +208,11 @@ router.post('/:id/export', verifyToken, isStaff, async (req, res) => {
         
         // 1. Create Inventory_DOC (Type 2 = Export) as DRAFT (status 0)
         const docRequest = new sql.Request(transaction);
-        await docRequest
-            .input('doc_id', sql.Char(10), docId)
-            .input('doc_type', sql.TinyInt, 2)
-            .input('created_by', sql.VarChar, staffId)
-            .input('desc', sql.NVarChar, `Phiếu xuất chờ duyệt cho đơn hàng #${orderId}`)
-            .input('status', sql.TinyInt, 0) // Start as Draft
-            .input('order_ref', sql.VarChar, orderId)
-            .input('inv_id', sql.TinyInt, 1)
-            .query(`INSERT INTO Inventory_DOCs (doc_id, doc_type, created_by, created_at, Doc_description, status, order_ref, inventory_id)
-                    VALUES (@doc_id, @doc_type, @created_by, GETDATE(), @desc, @status, @order_ref, @inv_id)`);
-
-        for (const item of serials) {
-            // 2. Create DOC_Details
-            const detailRequest = new sql.Request(transaction);
-            await detailRequest
-                .input('doc_id', sql.Char(10), docId)
-                .input('sn', sql.VarChar, item.serial_number)
-                .input('pid', sql.Int, item.product_id)
-                .input('price', sql.Decimal(18, 2), item.unit_price)
-                .query(`INSERT INTO DOC_Details (doc_id, serial_number, product_id, unit_price)
-                        VALUES (@doc_id, @sn, @pid, @price)`);
-            
-            // Note: We don't update Stock_Units manually here. 
-            // The trigger trg_HandleInventoryApproval will do it when we set status to 1.
-        }
-
-        // 3. (REMOVED) We no longer auto-approve the document here. 
-        // Approval will be handled in the Inventory Management module.
-
-        // 4. Update Order Status to 'processing' (Waiting for export approval)
-        const orderRequest = new sql.Request(transaction);
-        await orderRequest
-            .input('id', sql.VarChar, orderId)
-            .query("UPDATE Orders SET status = 'processing' WHERE order_id = @id");
+        await docRequest.input('doc_id', sql.Char(10), docId)
+            .input('staffId', sql.VarChar, staffId)
+            .input('orderId', sql.VarChar, orderId)
+            .input('details', detailTable)
+            .execute('sp_ConfirmOrderAndCreateExport');
 
         await transaction.commit();
         await logActivity(staffId, `Xác nhận đơn hàng #${orderId} và tạo phiếu xuất kho: ${docId}`, 'success');
@@ -305,7 +269,7 @@ router.put('/:id/status', verifyToken, isStaff, async (req, res) => {
         await pool.request()
             .input('id', sql.VarChar, req.params.id)
             .input('status', sql.VarChar, status)
-            .query("UPDATE Orders SET status = @status WHERE order_id = @id");
+            .execute('sp_ChangeOrderStatus');
         
         const statusMap = {
             'pending': 'Chờ xử lý',

@@ -23,15 +23,8 @@ const { sql, poolPromise } = require('../config/db');
 router.get('/', async (req, res) => {
     try {
         const pool = await poolPromise;
-        const result = await pool.request().query(`
-            SELECT p.product_id, p.product_name, p.brand, p.unit_price, p.image_url, p.specs_json,
-                   c.cat_name AS category_name,
-                   (SELECT COUNT(*) FROM Stock_Units su WHERE su.product_id = p.product_id AND su.status = 1) AS stock
-            FROM Product p
-            LEFT JOIN Categories c ON p.cat_id = c.cat_id
-            ORDER BY p.product_name
-        `);
-
+        const result = await pool.request().execute('vw_CustomerProducts');
+        
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         const products = result.recordset.map(product => {
             const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
@@ -92,46 +85,17 @@ router.get('/', async (req, res) => {
 // Search and filter customer products
 router.get('/search', async (req, res) => {
     const { q, category, brand, minPrice, maxPrice } = req.query;
-    const clauses = [];
+    // const clauses = [];
     const request = (await poolPromise).request();
 
-    if (q) {
-        request.input('query', sql.NVarChar, `%${q}%`);
-        clauses.push(`(p.product_name LIKE @query OR p.brand LIKE @query OR c.cat_name LIKE @query)`);
-    }
-    if (category) {
-        request.input('category', sql.NVarChar, category);
-        clauses.push('c.cat_name = @category');
-    }
-    if (brand) {
-        request.input('brand', sql.NVarChar, brand);
-        clauses.push('p.brand = @brand');
-    }
-    if (minPrice) {
-        request.input('minPrice', sql.Decimal(18, 2), Number(minPrice));
-        clauses.push('p.unit_price >= @minPrice');
-    }
-    if (maxPrice) {
-        request.input('maxPrice', sql.Decimal(18, 2), Number(maxPrice));
-        clauses.push('p.unit_price <= @maxPrice');
-    }
-
-    let query = `
-        SELECT p.product_id, p.product_name, p.brand, p.unit_price, p.image_url, p.specs_json,
-               c.cat_name AS category_name,
-               (SELECT COUNT(*) FROM Stock_Units su WHERE su.product_id = p.product_id AND su.status = 1) AS stock
-        FROM Product p
-        LEFT JOIN Categories c ON p.cat_id = c.cat_id
-    `;
-
-    if (clauses.length > 0) {
-        query += ' WHERE ' + clauses.join(' AND ');
-    }
-
-    query += ' ORDER BY p.product_name';
+    request.input('query', sql.NVarChar, q || null);
+    request.input('category', sql.NVarChar, category || null);
+    request.input('brand', sql.NVarChar, brand || null);
+    request.input('minPrice', sql.Decimal(18, 2), minPrice ? Number(minPrice) : null);
+    request.input('maxPrice', sql.Decimal(18, 2), maxPrice ? Number(maxPrice) : null);
 
     try {
-        const result = await request.query(query);
+        const result = await request.execute('sp_SearchProducts');
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         const products = result.recordset.map(product => {
             const imageUrl = product.image_url && product.image_url.startsWith('/uploads')

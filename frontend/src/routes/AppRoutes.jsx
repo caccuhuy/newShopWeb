@@ -12,6 +12,7 @@ const ProductDetailPage = lazy(() => import('../pages/customer/ProductDetailPage
 const CheckoutPage = lazy(() => import('../pages/customer/CheckoutPage/CheckoutPage'));
 const CategoriesPage = lazy(() => import('../pages/customer/CategoriesPage/CategoriesPage'));
 const ProfilePage = lazy(() => import('../pages/customer/ProfilePage/ProfilePage'));
+const PurchaseHistoryPage = lazy(() => import('../pages/customer/PurchaseHistoryPage/PurchaseHistoryPage'));
 const CustomerLogin = lazy(() => import('../pages/auth/CustomerLogin/CustomerLogin'));
 const AdminLogin = lazy(() => import('../pages/auth/AdminLogin/AdminLogin'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard/AdminDashboard'));
@@ -37,7 +38,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/admin/inventory-test" element={<div>Inventory Test Page</div>} />
           <Route path="/admin/inventory" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStaff={true}>
                   <InventoryManagementPage />
               </ProtectedRoute>
           } />
@@ -47,7 +48,8 @@ function AppRoutes() {
           <Route path="/cart" element={<CheckoutPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/categories/:categoryName" element={<CategoriesPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/purchase-history" element={<ProtectedRoute><PurchaseHistoryPage /></ProtectedRoute>} />
           <Route path="/login" element={<CustomerLogin />} />
           
           {/* Admin/Staff Auth */}
@@ -60,7 +62,7 @@ function AppRoutes() {
               </ProtectedRoute>
           } />
           <Route path="/admin/orders" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStaff={true}>
                   <OrderManagementPage />
               </ProtectedRoute>
           } />
@@ -80,7 +82,7 @@ function AppRoutes() {
               </ProtectedRoute>
           } />
           <Route path="/admin" element={
-              <ProtectedRoute>
+              <ProtectedRoute requireStaff={true}>
                   <AdminDashboard />
               </ProtectedRoute>
           } />

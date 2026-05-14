@@ -30,9 +30,14 @@ const Header = () => {
                         Home
                     </NavLink>
                     {isAuthenticated && !isStaff && (
-                        <NavLink to="/profile" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-                            Profile
-                        </NavLink>
+                        <>
+                            <NavLink to="/profile" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
+                                Profile
+                            </NavLink>
+                            <NavLink to="/purchase-history" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
+                                Orders
+                            </NavLink>
+                        </>
                     )}
                     {isStaff && (
                         <NavLink to="/admin" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>

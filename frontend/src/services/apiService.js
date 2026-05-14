@@ -260,6 +260,22 @@ export const apiService = {
     },
 
     // Orders
+    getMyOrders: async () => {
+        const response = await fetch(`${BASE_URL}/orders/my-orders`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Lỗi lấy lịch sử đơn hàng');
+        return await response.json();
+    },
+
+    getMyOrderDetails: async (id) => {
+        const response = await fetch(`${BASE_URL}/orders/my-orders/${id}`, {
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Không tìm thấy chi tiết đơn hàng');
+        return await response.json();
+    },
+
     getOrders: async () => {
         const response = await fetch(`${BASE_URL}/orders`, {
             headers: getAuthHeaders()

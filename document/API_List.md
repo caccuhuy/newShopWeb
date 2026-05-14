@@ -30,8 +30,8 @@ Dưới đây là danh sách đầy đủ 41 API được phân loại theo từ
 
 ## 6. Đơn hàng Khách hàng (Customer Orders)
 - `POST /api/customer-orders`: Đặt hàng mới từ giỏ hàng.
-- `GET /api/customer-orders/history`: Xem lịch sử các đơn hàng đã đặt.
-- `GET /api/customer-orders/:id`: Xem chi tiết một đơn hàng cụ thể của khách hàng.
+- `GET /api/orders/my-orders`: Lấy danh sách lịch sử mua hàng cá nhân (Endpoint mới có tích hợp View/SP chuẩn hóa).
+- `GET /api/orders/my-orders/:id`: Lấy chi tiết đơn hàng cá nhân an toàn (Endpoint mới).
 
 ## 7. Danh mục (Categories)
 - `GET /api/categories`: Lấy danh sách danh mục sản phẩm.

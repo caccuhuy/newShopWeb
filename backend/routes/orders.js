@@ -51,6 +51,106 @@ router.get('/', verifyToken, isStaff, async (req, res) => {
 
 /**
  * @swagger
+ * /api/orders/my-orders:
+ *   get:
+ *     summary: Lấy danh sách lịch sử mua hàng của khách hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Danh sách đơn hàng cá nhân
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+// Get all orders for the logged in customer
+router.get('/my-orders', verifyToken, async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('userId', sql.VarChar, req.user.id)
+            .execute('sp_GetCustomerOrders');
+        
+        const orders = result.recordset.map(order => ({
+            id: order.order_id,
+            total_amount: order.total_amount,
+            status: order.status,
+            shipping_address: order.shipping_address,
+            created_at: order.created_at,
+            item_count: order.item_count
+        }));
+        
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/orders/my-orders/{id}:
+ *   get:
+ *     summary: Lấy chi tiết đơn hàng của khách hàng
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Chi tiết đơn hàng cá nhân
+ *       403:
+ *         description: Không có quyền truy cập
+ *       404:
+ *         description: Không tìm thấy đơn hàng
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+// Get order details for a customer
+router.get('/my-orders/:id', verifyToken, async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const orderResult = await pool.request()
+            .input('orderId', sql.VarChar, req.params.id)
+            .execute('sp_GetOrderAdminDetail');
+            
+        if (!orderResult.recordset || orderResult.recordset.length === 0) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const jsonString = Object.values(orderResult.recordset[0])[0];
+        if (!jsonString) return res.status(404).json({ message: 'Order not found' });
+        
+        const orderData = JSON.parse(jsonString);
+
+        if (orderData.user_id !== req.user.id) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+        // Parse serials
+        if (orderData.items) {
+            orderData.items.forEach(item => {
+                if (typeof item.serials_raw === 'string') {
+                    item.serials = JSON.parse('[' + item.serials_raw + ']');
+                } else {
+                    item.serials = [];
+                }
+                delete item.serials_raw;
+            });
+        }
+
+        res.json(orderData);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/**
+ * @swagger
  * /api/orders/{id}:
  *   get:
  *     summary: Lấy chi tiết đơn hàng

@@ -72,14 +72,18 @@ router.get('/:id', verifyToken, isStaff, async (req, res) => {
     try {
         const pool = await poolPromise;
         const orderResult = await pool.request()
-            .input('id', sql.VarChar, req.params.id)
+            .input('orderId', sql.VarChar, req.params.id)
             .execute('sp_GetOrderAdminDetail');
-        // query("SELECT o.*, u.username, u.phone_number FROM Orders o LEFT JOIN Users u ON o.user_id = u.user_id WHERE o.order_id = @id");
             
-        if (orderResult.recordset[0]=== 0|| !orderResult.recordset[0]['']) return res.status(404).json({ message: 'Order not found' });
+        if (!orderResult.recordset || orderResult.recordset.length === 0) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
 
-        // Parse chuỗi JSON duy nhất trả về từ SQL
-        const orderData = JSON.parse(orderResult.recordset[0]['']);
+        // Parse chuỗi JSON duy nhất trả về từ SQL an toàn
+        const jsonString = Object.values(orderResult.recordset[0])[0];
+        if (!jsonString) return res.status(404).json({ message: 'Order not found' });
+        
+        const orderData = JSON.parse(jsonString);
 
         // Hậu xử lý nhẹ cho mảng serials nếu SQL trả về dạng chuỗi
         if (orderData.items) {
@@ -122,15 +126,18 @@ router.get('/:id/check-stock', verifyToken, isStaff, async (req, res) => {
     try {
         const pool = await poolPromise;
         const itemsResult = await pool.request()
-            .input('id', sql.VarChar, req.params.id)
+            .input('orderId', sql.VarChar, req.params.id)
             .execute('sp_GetOrderStockReport');
 
-        if (!itemsResult.recordset[0] || !itemsResult.recordset[0]['']) {
+        if (!itemsResult.recordset || itemsResult.recordset.length === 0) {
             return res.json([]);
         }
 
-        // SQL Server trả về chuỗi JSON, ta parse nó
-        let stockReport = JSON.parse(itemsResult.recordset[0]['']);
+        // SQL Server trả về chuỗi JSON an toàn
+        const jsonString = Object.values(itemsResult.recordset[0])[0];
+        if (!jsonString) return res.json([]);
+
+        let stockReport = JSON.parse(jsonString);
 
         // Chuyển đổi định dạng mảng serials từ [{serial_number: "SN1"}] thành ["SN1"] 
         stockReport = stockReport.map(item => ({

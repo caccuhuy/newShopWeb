@@ -17,6 +17,7 @@ const ProductManagementPage = () => {
     
     // UI States
     const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '' });
+    const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
     const [showProductModal, setShowProductModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -114,15 +115,22 @@ const ProductManagementPage = () => {
         }
     };
 
-    const deleteProduct = async (id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
-        try {
-            await apiService.deleteProduct(id);
-            loadData();
-            setAlertConfig({ isOpen: true, type: 'success', title: 'Thành công', message: 'Xóa sản phẩm thành công!' });
-        } catch (error) {
-            setAlertConfig({ isOpen: true, type: 'error', title: 'Lỗi', message: error.message });
-        }
+    const deleteProduct = (id) => {
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Xóa sản phẩm',
+            message: 'Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.',
+            onConfirm: async () => {
+                setConfirmConfig({ ...confirmConfig, isOpen: false });
+                try {
+                    await apiService.deleteProduct(id);
+                    loadData();
+                    setAlertConfig({ isOpen: true, type: 'success', title: 'Thành công', message: 'Xóa sản phẩm thành công!' });
+                } catch (error) {
+                    setAlertConfig({ isOpen: true, type: 'error', title: 'Lỗi', message: error.message });
+                }
+            }
+        });
     };
 
     // Category Handlers
@@ -148,15 +156,22 @@ const ProductManagementPage = () => {
         }
     };
 
-    const deleteCategory = async (id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
-        try {
-            await apiService.deleteCategory(id);
-            loadData();
-            setAlertConfig({ isOpen: true, type: 'success', title: 'Thành công', message: 'Xóa danh mục thành công!' });
-        } catch (error) {
-            setAlertConfig({ isOpen: true, type: 'error', title: 'Lỗi', message: error.message });
-        }
+    const deleteCategory = (id) => {
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Xóa danh mục',
+            message: 'Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.',
+            onConfirm: async () => {
+                setConfirmConfig({ ...confirmConfig, isOpen: false });
+                try {
+                    await apiService.deleteCategory(id);
+                    loadData();
+                    setAlertConfig({ isOpen: true, type: 'success', title: 'Thành công', message: 'Xóa danh mục thành công!' });
+                } catch (error) {
+                    setAlertConfig({ isOpen: true, type: 'error', title: 'Lỗi', message: error.message });
+                }
+            }
+        });
     };
 
     // Unique brands for filter
@@ -494,6 +509,14 @@ const ProductManagementPage = () => {
                     type={alertConfig.type}
                     title={alertConfig.title}
                     message={alertConfig.message}
+                />
+                <AlertModal 
+                    isOpen={confirmConfig.isOpen}
+                    onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+                    type="warning"
+                    title={confirmConfig.title}
+                    message={confirmConfig.message}
+                    onConfirm={confirmConfig.onConfirm}
                 />
             </div>
         </AdminLayout>

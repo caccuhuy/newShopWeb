@@ -1,0 +1,76 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecaseFontSize 11
+
+actor "Nhan vien (Staff)" as STF
+actor "Quan tri vien (Manager)" as MGR
+
+rectangle "Phan he Xu ly Don hang" {
+    usecase "Xem danh sach don hang (UC-S01)" as UC_S01
+    usecase "Xem chi tiet don hang (UC-S02)" as UC_S02
+    usecase "Kiem tra ton kho theo don (UC-S03)" as UC_S03
+    usecase "Xuat kho theo don hang (UC-S04)" as UC_S04
+    usecase "Cap nhat trang thai don (UC-S05)" as UC_S05
+
+    UC_S04 .> UC_S03 : <<include>>
+    UC_S04 .> UC_S02 : <<include>>
+}
+
+rectangle "Phan he Quan ly Kho" {
+    usecase "Lap phieu nhap kho (UC-S06)" as UC_S06
+    usecase "Lap phieu xuat kho (UC-S07)" as UC_S07
+    usecase "Xem danh sach phieu kho (UC-S08)" as UC_S08
+    usecase "Xem chi tiet phieu kho (UC-S09)" as UC_S09
+    usecase "Kiem tra ma Serial (UC-S10)" as UC_S10
+
+    UC_S06 .> UC_S10 : <<include>>
+    UC_S07 .> UC_S10 : <<include>>
+    UC_S09 .> UC_S08 : <<extend>>
+}
+
+rectangle "Phan he Quan tri - Manager only" {
+    usecase "Duyet phieu kho (UC-M01)" as UC_M01
+    usecase "Huy phieu kho (UC-M02)" as UC_M02
+    usecase "Xem Dashboard & KPI (UC-M03)" as UC_M03
+    usecase "Quan ly San pham (UC-M04)" as UC_M04
+    usecase "Quan ly Danh muc (UC-M05)" as UC_M05
+    usecase "Quan ly Nha cung cap (UC-M06)" as UC_M06
+    usecase "Quan ly Nhan vien (UC-M07)" as UC_M07
+    usecase "Xem Nhat ky hoat dong (UC-M08)" as UC_M08
+
+    UC_M01 .> UC_S09 : <<include>>
+    UC_M02 .> UC_M01 : <<extend>>
+}
+
+STF --> UC_S01
+STF --> UC_S02
+STF --> UC_S03
+STF --> UC_S04
+STF --> UC_S05
+STF --> UC_S06
+STF --> UC_S07
+STF --> UC_S08
+STF --> UC_S09
+STF --> UC_S10
+
+MGR --> UC_S01
+MGR --> UC_S02
+MGR --> UC_S03
+MGR --> UC_S04
+MGR --> UC_S05
+MGR --> UC_S06
+MGR --> UC_S07
+MGR --> UC_S08
+MGR --> UC_S09
+MGR --> UC_S10
+MGR --> UC_M01
+MGR --> UC_M02
+MGR --> UC_M03
+MGR --> UC_M04
+MGR --> UC_M05
+MGR --> UC_M06
+MGR --> UC_M07
+MGR --> UC_M08
+
+@enduml

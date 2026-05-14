@@ -1,0 +1,73 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseFontSize 12
+
+actor "Khach hang (Customer)" as CUS
+actor "Nhan vien (Staff)" as STF
+actor "Quan tri vien (Manager)" as MGR
+
+rectangle "He thong Quan ly Ban hang" {
+
+    package "Phan he Mua sam" {
+        usecase "Dang ky / Dang nhap" as UC_Auth
+        usecase "Xem & Tim kiem san pham" as UC_Browse
+        usecase "Quan ly gio hang" as UC_Cart
+        usecase "Dat hang truc tuyen" as UC_Order
+        usecase "Xem lich su don hang" as UC_History
+        usecase "Cap nhat ho so ca nhan" as UC_Profile
+    }
+
+    package "Phan he Xu ly Don hang" {
+        usecase "Tiep nhan & Xu ly don" as UC_ProcessOrder
+        usecase "Lap phieu xuat kho theo don" as UC_ExportByOrder
+        usecase "Cap nhat trang thai don" as UC_UpdateOrderStatus
+    }
+
+    package "Phan he Quan ly Kho" {
+        usecase "Lap phieu Nhap / Xuat kho" as UC_CreateDoc
+        usecase "Tra cuu phieu kho" as UC_ViewDoc
+        usecase "Kiem tra ma Serial" as UC_ValidateSerial
+    }
+
+    package "Phan he Quan tri" {
+        usecase "Duyet / Huy phieu kho" as UC_ApproveDoc
+        usecase "Quan ly San pham & Danh muc" as UC_ManageProduct
+        usecase "Quan ly Nha cung cap" as UC_ManageSupplier
+        usecase "Quan ly Nhan vien" as UC_ManageStaff
+        usecase "Xem Dashboard & Bao cao" as UC_Dashboard
+        usecase "Xem Nhat ky hoat dong" as UC_Log
+    }
+}
+
+CUS --> UC_Auth
+CUS --> UC_Browse
+CUS --> UC_Cart
+CUS --> UC_Order
+CUS --> UC_History
+CUS --> UC_Profile
+
+STF --> UC_Auth
+STF --> UC_ProcessOrder
+STF --> UC_ExportByOrder
+STF --> UC_UpdateOrderStatus
+STF --> UC_CreateDoc
+STF --> UC_ViewDoc
+STF --> UC_ValidateSerial
+
+MGR --> UC_Auth
+MGR --> UC_ProcessOrder
+MGR --> UC_ExportByOrder
+MGR --> UC_UpdateOrderStatus
+MGR --> UC_CreateDoc
+MGR --> UC_ViewDoc
+MGR --> UC_ValidateSerial
+MGR --> UC_ApproveDoc
+MGR --> UC_ManageProduct
+MGR --> UC_ManageSupplier
+MGR --> UC_ManageStaff
+MGR --> UC_Dashboard
+MGR --> UC_Log
+
+@enduml

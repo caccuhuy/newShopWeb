@@ -8,29 +8,49 @@ import { clsx } from 'clsx';
 
 const HomePage = () => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get('search') || '';
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterBrand, setFilterBrand] = useState('');
+    const [filterPrice, setFilterPrice] = useState('');
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const data = await apiService.getProducts();
-                setProducts(data);
+                const [prodData, catData] = await Promise.all([
+                    apiService.getProducts(),
+                    apiService.getCategories()
+                ]);
+                setProducts(prodData);
+                setCategories(catData);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.error('Error fetching data:', error);
                 setProducts([]);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProducts();
+        fetchData();
     }, []);
 
-    const filteredProducts = products.filter(p => 
-        (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
-        (p.brand?.toLowerCase().includes(searchQuery.toLowerCase()) || false)
-    );
+    const brands = [...new Set(products.map(p => p.brand))].filter(Boolean).sort();
+
+    const filteredProducts = products.filter(p => {
+        const matchesSearch = (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
+                              (p.brand?.toLowerCase().includes(searchQuery.toLowerCase()) || false);
+        const matchesBrand = filterBrand === '' || p.brand === filterBrand;
+        const matchesCategory = filterCategory === '' || p.cat_id?.toString() === filterCategory;
+        
+        let matchesPrice = true;
+        if (filterPrice === 'under10m') matchesPrice = p.price < 10000000;
+        else if (filterPrice === '10m-20m') matchesPrice = p.price >= 10000000 && p.price <= 20000000;
+        else if (filterPrice === '20m-30m') matchesPrice = p.price > 20000000 && p.price <= 30000000;
+        else if (filterPrice === 'over30m') matchesPrice = p.price > 30000000;
+
+        return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
+    });
 
     return (
         <div className={styles.wrapper}>
@@ -62,9 +82,45 @@ const HomePage = () => {
 
             <section className={clsx(styles.productSection, searchQuery && styles.productSectionSearch)}>
                 <div className={styles.container}>
-                    <h2 className={styles.sectionTitle}>
-                        {searchQuery ? `Kết quả cho "${searchQuery}"` : 'Sản Phẩm Bán Chạy'}
-                    </h2>
+                    <div className={styles.titleWithFilters}>
+                        <h2 className={styles.sectionTitle}>
+                            {searchQuery ? `Kết quả cho "${searchQuery}"` : 'Sản Phẩm Bán Chạy'}
+                        </h2>
+                        
+                        {!loading && products.length > 0 && (
+                            <div className={styles.filterSection}>
+                                <select 
+                                    className={styles.filterSelect}
+                                    value={filterCategory}
+                                    onChange={(e) => setFilterCategory(e.target.value)}
+                                >
+                                    <option value="">Tất cả danh mục</option>
+                                    {categories.map(c => <option key={c.cat_id} value={c.cat_id.toString()}>{c.cat_name}</option>)}
+                                </select>
+
+                                <select 
+                                    className={styles.filterSelect}
+                                    value={filterBrand}
+                                    onChange={(e) => setFilterBrand(e.target.value)}
+                                >
+                                    <option value="">Tất cả thương hiệu</option>
+                                    {brands.map(b => <option key={b} value={b}>{b}</option>)}
+                                </select>
+                                
+                                <select 
+                                    className={styles.filterSelect}
+                                    value={filterPrice}
+                                    onChange={(e) => setFilterPrice(e.target.value)}
+                                >
+                                    <option value="">Mọi mức giá</option>
+                                    <option value="under10m">Dưới 10 triệu</option>
+                                    <option value="10m-20m">Từ 10 - 20 triệu</option>
+                                    <option value="20m-30m">Từ 20 - 30 triệu</option>
+                                    <option value="over30m">Trên 30 triệu</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
                     {loading ? (
                         <div className={styles.loading}>Đang tải sản phẩm...</div>
                     ) : filteredProducts.length > 0 ? (

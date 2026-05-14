@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecaseFontSize 12
+
+actor "Khach hang (Customer)" as CUS
+
+rectangle "Phan he Mua sam (Storefront)" {
+
+    usecase "Dang ky tai khoan (UC-C01)" as UC_C01
+    usecase "Dang nhap he thong (UC-C02)" as UC_C02
+    usecase "Xem danh sach san pham (UC-C03)" as UC_C03
+    usecase "Tim kiem & loc san pham (UC-C04)" as UC_C04
+    usecase "Xem chi tiet san pham (UC-C05)" as UC_C05
+    usecase "Quan ly gio hang (UC-C06)" as UC_C06
+    usecase "Dat hang truc tuyen (UC-C07)" as UC_C07
+    usecase "Xem lich su don hang (UC-C08)" as UC_C08
+    usecase "Xem chi tiet don hang (UC-C09)" as UC_C09
+    usecase "Cap nhat ho so ca nhan (UC-C10)" as UC_C10
+
+    UC_C07 .> UC_C06 : <<include>>
+    UC_C07 .> UC_C02 : <<include>>
+    UC_C06 .> UC_C05 : <<include>>
+    UC_C04 .> UC_C03 : <<extend>>
+    UC_C05 .> UC_C03 : <<extend>>
+    UC_C09 .> UC_C08 : <<extend>>
+}
+
+CUS --> UC_C01
+CUS --> UC_C02
+CUS --> UC_C03
+CUS --> UC_C04
+CUS --> UC_C05
+CUS --> UC_C06
+CUS --> UC_C07
+CUS --> UC_C08
+CUS --> UC_C09
+CUS --> UC_C10
+
+@enduml

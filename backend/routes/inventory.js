@@ -57,19 +57,22 @@ router.get('/docs/:id', verifyToken, isStaff, async (req, res) => {
     try {
         const pool = await poolPromise;
         const docResult = await pool.request()
-            .input('id', sql.Char(10), req.params.id)
+            .input('docId', sql.Char(10), req.params.id)
             .execute('sp_GetInventoryDocDetail');
 
-        if (!docResult.recordset || docResult.recordset.length === 0 || !docResult.recordset[0]['']) {
+        if (!docResult.recordset || docResult.recordset.length === 0) {
             return res.status(404).json({ error: 'Không tìm thấy phiếu kho' });
         }
 
-        const inventoryData = JSON.parse(docResult.recordset[0]['']);
+        // Lấy giá trị đầu tiên của object kết quả (SQL Server trả về key ngẫu nhiên cho JSON)
+        const jsonString = Object.values(docResult.recordset[0])[0];
+        
+        if (!jsonString) {
+            return res.status(404).json({ error: 'Dữ liệu phiếu kho trống' });
+        }
+
+        const inventoryData = JSON.parse(jsonString);
         res.json(inventoryData);
-        // res.json({
-        //     ...docResult.recordset[0],
-        //     details: detailsResult.recordset
-        // });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -110,12 +113,12 @@ router.post('/validate-serial', verifyToken, isStaff, async (req, res) => {
             .input('doc_type', sql.Int, parseInt(doc_type))
             .execute('sp_ValidateSerialNumber');
 
-        if (result.recordset.length === 0) {
+        if (snResult.recordset.length === 0) {
             return res.status(404).json({ error: 'Lỗi không xác định khi kiểm tra Serial.' });
         }
 
         // doc_type: 1: Nhập, 2: Xuất, 3: Trả NCC, 4: Nhận BH, 6: NCC Trả BH, 7: Trả BH khách
-        const data = result.recordset[0];
+        const data = snResult.recordset[0];
         res.json({
             isValid: data.isValid,
             message: data.message,
@@ -125,8 +128,6 @@ router.post('/validate-serial', verifyToken, isStaff, async (req, res) => {
                 brand: data.brand
             } : null
         });
-
-        res.json({ isValid, message, product, snData });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -260,27 +261,23 @@ router.put('/docs/:id/details', verifyToken, isStaff, async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        try{
         const detailTable = new sql.Table('StockItemType');
         detailTable.columns.add('product_id', sql.Int);
         detailTable.columns.add('serial_number', sql.VarChar(50));
         detailTable.columns.add('unit_price', sql.Decimal(18, 2));
+        
         // Đổ dữ liệu từ array details vào bảng TVP
         details.forEach(item => {
             detailTable.rows.add(item.product_id, item.serial_number, item.unit_price || 0);
         });
         
-        // 1. Check if doc exists and is in Draft (0)
-        const checkResult = await pool.request()
-            .input('id', sql.Char(10), docId)
-            .input('details', detailTable);
+        // 1. Update doc details
+        await pool.request()
+            .input('docId', sql.Char(10), docId)
+            .input('details', detailTable)
+            .execute('sp_UpdateInventoryDetails');
 
-        await checkResult.execute('sp_UpdateInventoryDetails');
-            res.json({ message: 'Cập nhật chi tiết phiếu thành công' });
-        } catch (err) {
-            await transaction.rollback();
-            throw err;
-        }
+        res.json({ message: 'Cập nhật chi tiết phiếu thành công' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -320,23 +317,18 @@ router.put('/docs/:id/status', verifyToken, isStaff, async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        try{
 
         // Check if doc exists and is in Draft (0)
-        const checkResult = await pool.request()
-            .input('id', sql.Char(10), docId)
-            .input('status', sql.TinyInt, status);
-        await checkResult.execute('sp_ApproveOrCancelInventoryDoc');
+        await pool.request()
+            .input('docId', sql.Char(10), docId)
+            .input('targetStatus', sql.TinyInt, status)
+            .execute('sp_ApproveOrCancelInventoryDoc');
             
-            const statusStr = status === 1 ? 'Duyệt' : 'Hủy';
-            const logType = status === 1 ? 'success' : 'warning';
-            await logActivity(req.user.id, `${statusStr} phiếu kho: ${docId}`, logType);
+        const statusStr = status === 1 ? 'Duyệt' : 'Hủy';
+        const logType = status === 1 ? 'success' : 'warning';
+        await logActivity(req.user.id, `${statusStr} phiếu kho: ${docId}`, logType);
 
-            res.json({ message: status === 1 ? 'Duyệt phiếu thành công' : 'Hủy phiếu thành công' });
-        } catch (err) {
-            await transaction.rollback();
-            throw err;
-        }
+        res.json({ message: status === 1 ? 'Duyệt phiếu thành công' : 'Hủy phiếu thành công' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

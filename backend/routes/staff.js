@@ -3,6 +3,7 @@ const router = express.Router();
 const { sql, poolPromise } = require('../config/db');
 const crypto = require('crypto');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
+const { logActivity } = require('../utils/logger');
 
 /**
  * @swagger
@@ -85,8 +86,7 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
         const hash = crypto.createHash('sha256').update('123456').digest('hex');
 
         // Insert
-        await pool.request()
-            .input('user_id', sql.VarChar, newUserId)
+        const result = await pool.request()
             .input('username', sql.NVarChar, name)
             .input('pasword_hash', sql.VarChar, hash)
             .input('email', sql.VarChar, email)
@@ -94,6 +94,7 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
             .input('role_name', sql.VarChar, role)
             .execute('sp_AddStaff');
             
+        const newUserId = result.recordset[0].newUserId;
         await logActivity(req.user.id, `Tạo tài khoản mới: ${newUserId} (${name})`, 'success');
         res.status(201).json({ message: 'Thêm nhân viên thành công' });
     } catch (err) {

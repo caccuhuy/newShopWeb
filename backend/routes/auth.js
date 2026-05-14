@@ -3,6 +3,7 @@ const router = express.Router();
 const { sql, poolPromise } = require('../config/db');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const { logActivity } = require('../utils/logger');
 
 // Login Endpoint
 /**
@@ -140,11 +141,12 @@ router.post('/register', async (req, res) => {
         const hash = crypto.createHash('sha256').update(password).digest('hex');
 
         const result = await pool.request()
+            .output('user_id', sql.VarChar(10))
             .input('username', sql.NVarChar, name)
-            .input('pasword_hash', sql.VarChar, hash)
             .input('email', sql.VarChar, email)
             .input('phone_number', sql.Char, phone_number)
             .input('default_address', sql.NVarChar, address)
+            .input('pasword_hash', sql.VarChar, hash)
             .execute('sp_RegisterCustomer');
 
         const newUserId = result.recordset[0].newUserId;

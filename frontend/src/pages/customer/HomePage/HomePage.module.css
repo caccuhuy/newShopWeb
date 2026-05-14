@@ -108,12 +108,55 @@
     padding-top: 8rem;
 }
 
+.titleWithFilters {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .titleWithFilters {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+}
+
 .sectionTitle {
     font-size: 1.875rem;
     font-weight: 700;
-    text-align: center;
-    margin-bottom: 4rem;
     color: #111827;
+    margin: 0;
+}
+
+.filterSection {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filterSelect {
+    padding: 0.625rem 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    background: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    outline: none;
+    cursor: pointer;
+    min-width: 160px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.filterSelect:focus, .filterSelect:hover {
+    border-color: #3b82f6;
+    color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .grid {

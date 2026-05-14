@@ -29,7 +29,6 @@ const Header = () => {
                     <NavLink to="/" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
                         Home
                     </NavLink>
-                    <Link to="/categories" className={styles.navLink}>Categories</Link>
                     {isAuthenticated && !isStaff && (
                         <NavLink to="/profile" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
                             Profile

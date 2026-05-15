@@ -19,10 +19,10 @@ const { logActivity } = require('../utils/logger');
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
  *               password:
  *                 type: string
@@ -106,21 +106,21 @@ router.post('/login', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - username
- *               - password
- *               - fullname
+ *               - name
  *               - email
- *               - phone
+ *               - password
+ *               - phone_number
+ *               - address
  *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *               fullname:
+ *               name:
  *                 type: string
  *               email:
  *                 type: string
- *               phone:
+ *               password:
+ *                 type: string
+ *               phone_number:
+ *                 type: string
+ *               address:
  *                 type: string
  *     responses:
  *       201:

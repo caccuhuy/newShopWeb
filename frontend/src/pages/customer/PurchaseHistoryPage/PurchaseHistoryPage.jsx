@@ -42,18 +42,18 @@ const PurchaseHistoryPage = () => {
 
     const getStatusBadge = (status) => {
         const normalizedStatus = (status || '').toString().toLowerCase();
-        switch(normalizedStatus) {
-            case 'pending': 
+        switch (normalizedStatus) {
+            case 'pending':
             case '0':
                 return <span className={`${styles.badge} ${styles.badgePending}`}>Chờ xử lý</span>;
             case 'processing':
-            case 'shipped': 
+            case 'shipped':
             case '1':
                 return <span className={`${styles.badge} ${styles.badgeProcessing}`}>Đang giao hàng</span>;
-            case 'completed': 
+            case 'completed':
             case '2':
                 return <span className={`${styles.badge} ${styles.badgeCompleted}`}>Hoàn thành</span>;
-            case 'cancelled': 
+            case 'cancelled':
             case '-1':
                 return <span className={`${styles.badge} ${styles.badgeCancelled}`}>Đã hủy</span>;
             default: return <span className={styles.badge}>{status || 'Không rõ'}</span>;
@@ -61,10 +61,17 @@ const PurchaseHistoryPage = () => {
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN', {
-            year: 'numeric', month: 'long', day: 'numeric',
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '';
+
+        const datePart = date.toLocaleDateString('vi-VN', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const timePart = date.toLocaleTimeString('vi-VN', {
             hour: '2-digit', minute: '2-digit'
         });
+        return `${timePart} ${datePart}`;
     };
 
     const formatPrice = (price) => {
@@ -106,7 +113,7 @@ const PurchaseHistoryPage = () => {
                                         {formatPrice(order.total_amount)}
                                     </div>
                                 </div>
-                                <button 
+                                <button
                                     className={styles.viewButton}
                                     onClick={() => viewDetails(order.id)}
                                 >
@@ -119,8 +126,8 @@ const PurchaseHistoryPage = () => {
                 )}
             </main>
 
-            <Modal 
-                isOpen={!!selectedOrder} 
+            <Modal
+                isOpen={!!selectedOrder}
                 onClose={() => { setSelectedOrder(null); setOrderDetails(null); }}
                 title={`Chi tiết đơn hàng #${selectedOrder}`}
                 size="md"

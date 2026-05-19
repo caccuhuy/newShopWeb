@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { sql, poolPromise } = require('../config/db');
-const crypto = require('crypto');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
+const StaffModule = require('../modules/StaffModule');
 
 /**
  * @swagger
@@ -25,15 +24,12 @@ const { logActivity } = require('../utils/logger');
  *         description: Danh sách nhân viên
  */
 // Get all staff and admins
-router.get('/', verifyToken, isAdmin, async (req, res) => {
+router.get('/', verifyToken, isAdmin, async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request().execute('vw_GetAllStaffs');
-            
-        res.json(result.recordset);
+        const staff = await StaffModule.getAll();
+        res.json(staff);
     } catch (err) {
-        console.error('Error fetching staff:', err);
-        res.status(500).json({ error: 'Lỗi server nội bộ' });
+        next(err);
     }
 });
 
@@ -71,35 +67,14 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
  *         description: Thêm thành công
  */
 // Create a new staff/admin
-router.post('/', verifyToken, isAdmin, async (req, res) => {
+router.post('/', verifyToken, isAdmin, async (req, res, next) => {
     const { name, email, phone_number, role } = req.body;
-
-    if (!name || !email || !phone_number || !role) {
-        return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin' });
-    }
-
     try {
-        const pool = await poolPromise;
-        
-
-        // Hash default password '123456'
-        const hash = crypto.createHash('sha256').update('123456').digest('hex');
-
-        // Insert
-        const result = await pool.request()
-            .input('username', sql.NVarChar, name)
-            .input('pasword_hash', sql.VarChar, hash)
-            .input('email', sql.VarChar, email)
-            .input('phone_number', sql.Char, phone_number)
-            .input('role_name', sql.VarChar, role)
-            .execute('sp_AddStaff');
-            
-        const newUserId = result.recordset[0].newUserId;
-        await logActivity(req.user.id, `Tạo tài khoản mới: ${newUserId} (${name})`, 'success');
-        res.status(201).json({ message: 'Thêm nhân viên thành công' });
+        const result = await StaffModule.create(name, email, phone_number, role);
+        logActivity(req.user.id, `Tạo tài khoản mới: ${result.newUserId} (${name})`, 'success').catch(console.error);
+        res.status(201).json({ message: result.message });
     } catch (err) {
-        console.error('Error creating staff:', err);
-        res.status(500).json({ error: 'Lỗi server nội bộ' });
+        next(err);
     }
 });
 
@@ -131,28 +106,15 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
  *         description: Cập nhật thành công
  */
 // Toggle staff status
-router.put('/:id/status', verifyToken, isAdmin, async (req, res) => {
+router.put('/:id/status', verifyToken, isAdmin, async (req, res, next) => {
     const { is_active } = req.body;
-    const targetId = req.params.id;
-    const adminId = req.user.id;
-
     try {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('targetId', sql.VarChar, targetId)
-            .input('adminId', sql.VarChar, adminId)
-            .input('isActive', sql.Bit, is_active)
-            .execute('sp_ToggleUserActive');
-
-        const { username } = result.recordset[0];
+        const result = await StaffModule.toggleActive(req.params.id, req.user.id, is_active);
         const action = is_active ? 'Mở khóa' : 'Khóa';
-
-        await logActivity(adminId, `${action} tài khoản: ${username} (ID: ${targetId})`, is_active ? 'success' : 'warning');
-
-        res.json({ message: 'Cập nhật trạng thái thành công' });
+        logActivity(req.user.id, `${action} tài khoản: ${result.username} (ID: ${req.params.id})`, is_active ? 'success' : 'warning').catch(console.error);
+        res.json({ message: result.message });
     } catch (err) {
-        console.error('Error updating status:', err);
-        res.status(500).json({ error: 'Lỗi server nội bộ' });
+        next(err);
     }
 });
 
@@ -184,25 +146,13 @@ router.put('/:id/status', verifyToken, isAdmin, async (req, res) => {
  *         description: Reset thành công
  */
 // Reset password
-router.put('/:id/reset-password', verifyToken, isAdmin, async (req, res) => {
-    const { id } = req.params;
+router.put('/:id/reset-password', verifyToken, isAdmin, async (req, res, next) => {
     const { password } = req.body;
-
-    if (!password) return res.status(400).json({ message: 'Mật khẩu không được để trống' });
-
     try {
-        const pool = await poolPromise;
-        const hash = crypto.createHash('sha256').update(password).digest('hex');
-
-        await pool.request()
-            .input('user_id', sql.VarChar, id)
-            .input('hash', sql.VarChar, hash)
-            .execute('sp_ResetPassword');
-
-        res.json({ message: 'Reset mật khẩu thành công' });
+        const result = await StaffModule.resetPassword(req.params.id, password);
+        res.json(result);
     } catch (err) {
-        console.error('Error resetting password:', err);
-        res.status(500).json({ error: 'Lỗi server nội bộ' });
+        next(err);
     }
 });
 

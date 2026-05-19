@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
+const ProductModule = require('../modules/ProductModule');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
 // Multer Config
 const storage = multer.diskStorage({
@@ -62,43 +61,13 @@ const upload = multer({ storage });
  *                 $ref: '#/components/schemas/Product'
  */
 // Get all products
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request().execute('vw_GetAllProducts');
-
         const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const products = result.recordset.map(product => {
-            let specs = {};
-            try {
-                specs = product.specs_json ? JSON.parse(product.specs_json) : {};
-            } catch (parseErr) {
-                specs = {};
-            }
-
-            const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
-                ? `${baseUrl}${product.image_url}`
-                : product.image_url;
-
-            return {
-                id: product.product_id,
-                name: product.product_name,
-                brand: product.brand,
-                price: product.unit_price,
-                image_url: imageUrl,
-                specs,
-                specs_json: product.specs_json,
-                cat_id: product.cat_id,
-                category: product.category_name,
-                stock: product.stock,
-                warranty_period: product.warranty_period,
-                description: product.description || ''
-            };
-        });
-
+        const products = await ProductModule.getAllAdmin(baseUrl);
         res.json(products);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -126,42 +95,13 @@ router.get('/', async (req, res) => {
  *         description: Không tìm thấy sản phẩm
  */
 // Get single product
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .execute('sp_GetProductDetails');
-        if (result.recordset.length === 0) return res.status(404).json({ message: 'Product not found' });
-
-        const product = result.recordset[0];
-        let specs = {};
-        try {
-            specs = product.specs_json ? JSON.parse(product.specs_json) : {};
-        } catch (parseErr) {
-            specs = {};
-        }
-
-        const imageUrl = product.image_url && product.image_url.startsWith('/uploads')
-            ? `${req.protocol}://${req.get('host')}${product.image_url}`
-            : product.image_url;
-
-        res.json({
-            id: product.product_id,
-            name: product.product_name,
-            brand: product.brand,
-            price: product.unit_price,
-            image_url: imageUrl,
-            specs,
-            specs_json: product.specs_json,
-            cat_id: product.cat_id,
-            category: product.category_name,
-            stock: product.stock,
-            warranty_period: product.warranty_period,
-            description: product.description || ''
-        });
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const product = await ProductModule.getById(req.params.id, baseUrl);
+        res.json(product);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -198,28 +138,24 @@ router.get('/:id', async (req, res) => {
  *         description: Sản phẩm đã được tạo
  */
 // Create product (Admin)
-router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res) => {
+router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res, next) => {
     const { product_name, cat_id, specs_json, unit_price, brand, warranty_period } = req.body;
-    const image_url = req.file ? `/uploads/products/${req.file.filename}` : null;
+    const imageUrl = req.file ? `/uploads/products/${req.file.filename}` : null;
 
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('name', sql.NVarChar, product_name)
-            .input('cat', sql.Int, cat_id)
-            .input('specs', sql.NVarChar, specs_json)
-            .input('price', sql.Decimal(15, 2), unit_price)
-            .input('brand', sql.VarChar, brand)
-            .input('warranty', sql.Int, warranty_period)
-            .input('img', sql.VarChar, image_url)
-            .execute('sp_AddProducts');
-            
-        
-        await logActivity(req.user.id, `Thêm sản phẩm mới: ${product_name}`, 'success');
-
-        res.status(201).json({ message: 'Product created' });
+        const result = await ProductModule.create(
+            product_name,
+            cat_id,
+            specs_json,
+            unit_price,
+            brand,
+            warranty_period,
+            imageUrl
+        );
+        logActivity(req.user.id, `Thêm sản phẩm mới: ${product_name}`, 'success').catch(console.error);
+        res.status(201).json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -262,31 +198,29 @@ router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res) 
  *         description: Cập nhật thành công
  */
 // Update product (Admin)
-router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res) => {
+router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res, next) => {
     const { product_name, cat_id, specs_json, unit_price, brand, warranty_period } = req.body;
-    let image_url = req.body.image_url; // Use existing if no new file
+    let imageUrl = req.body.image_url;
 
     if (req.file) {
-        image_url = `/uploads/products/${req.file.filename}`;
+        imageUrl = `/uploads/products/${req.file.filename}`;
     }
 
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .input('name', sql.NVarChar, product_name)
-            .input('cat', sql.Int, cat_id)
-            .input('specs', sql.NVarChar, specs_json)
-            .input('price', sql.Decimal(18, 2), unit_price)
-            .input('brand', sql.VarChar, brand)
-            .input('warranty', sql.Int, warranty_period)
-            .input('img', sql.VarChar, image_url)
-            .execute('sp_AlterProducts');
-        await logActivity(req.user.id, `Cập nhật thông tin sản phẩm: ${product_name} (ID: ${req.params.id})`, 'info');
-
-        res.json({ message: 'Product updated' });
+        const result = await ProductModule.update(
+            req.params.id,
+            product_name,
+            cat_id,
+            specs_json,
+            unit_price,
+            brand,
+            warranty_period,
+            imageUrl
+        );
+        logActivity(req.user.id, `Cập nhật thông tin sản phẩm: ${product_name} (ID: ${req.params.id})`, 'info').catch(console.error);
+        res.json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -311,47 +245,13 @@ router.put('/:id', verifyToken, isAdmin, upload.single('image'), async (req, res
  *         description: Không thể xóa sản phẩm có dữ liệu ràng buộc
  */
 // Delete product (Admin)
-router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const id = req.params.id;
-
-        // Check FK constraints (Orders, DOC_Details, Stock_Units)
-        const prod = await pool.request()
-            .input('id', sql.Int, id)
-            .query("SELECT image_url FROM Product WHERE product_id = @id");
-
-            if (prod.recordset.length === 0) {
-                return res.status(404).json({ error: 'Sản phẩm không tồn tại.' });
-            }
-            const imgUrl = prod.recordset[0].image_url;
-
-            // 2. Chạy Procedure kiểm tra ràng buộc và thực hiện xóa
-            const result = await pool.request()
-                .input('id', sql.Int, id)
-                .execute('sp_DeleteProductWithCheck');
-
-            const { orderCount, docCount, stockCount, isDeleted } = result.recordset[0];
-
-            // 3. Nếu không xóa được do có ràng buộc khóa ngoại
-            if (isDeleted === 0) {
-                return res.status(400).json({ 
-                    error: 'Không thể xóa sản phẩm đã có giao dịch.',
-                    details: { orders: orderCount, docs: docCount, stock: stockCount }
-                });
-            }
-            
-        // Delete physical file
-        if (imgUrl && imgUrl.startsWith('/uploads/')) {
-            const filePath = path.join(__dirname, '../public', imgUrl);
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        }
-
-        await logActivity(req.user.id, `Xóa sản phẩm (ID: ${req.params.id})`, 'danger');
-
-        res.json({ message: 'Product deleted' });
+        const result = await ProductModule.delete(req.params.id);
+        logActivity(req.user.id, `Xóa sản phẩm (ID: ${req.params.id})`, 'danger').catch(console.error);
+        res.json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

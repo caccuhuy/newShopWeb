@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
+const SupplierModule = require('../modules/SupplierModule');
 
 /**
  * @swagger
@@ -22,13 +22,12 @@ const { logActivity } = require('../utils/logger');
  *         description: Danh sách nhà cung cấp
  */
 // Get all suppliers
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request().execute('vw_Suppliers');
-        res.json(result.recordset);
+        const suppliers = await SupplierModule.getAll();
+        res.json(suppliers);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -56,20 +55,14 @@ router.get('/', async (req, res) => {
  *         description: Tạo thành công
  */
 // Create supplier (Admin)
-router.post('/', verifyToken, isAdmin, async (req, res) => {
+router.post('/', verifyToken, isAdmin, async (req, res, next) => {
     const { tax_id, supplier_name } = req.body;
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('tax', sql.Char(10), tax_id)
-            .input('name', sql.NVarChar, supplier_name)
-            .execute('sp_AddSupplier');
-        
-        await logActivity(req.user.id, `Thêm nhà cung cấp mới: ${supplier_name} (MST: ${tax_id})`, 'success');
-
-        res.status(201).json({ message: 'Supplier created' });
+        const result = await SupplierModule.create(tax_id, supplier_name);
+        logActivity(req.user.id, `Thêm nhà cung cấp mới: ${supplier_name} (MST: ${tax_id})`, 'success').catch(console.error);
+        res.status(201).json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -101,20 +94,14 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
  *         description: Cập nhật thành công
  */
 // Update supplier (Admin)
-router.put('/:tax_id', verifyToken, isAdmin, async (req, res) => {
+router.put('/:tax_id', verifyToken, isAdmin, async (req, res, next) => {
     const { supplier_name } = req.body;
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('tax', sql.Char(10), req.params.tax_id)
-            .input('name', sql.NVarChar, supplier_name)
-            .execute('sp_UpdateSupplier');
-        
-        await logActivity(req.user.id, `Cập nhật thông tin nhà cung cấp: ${supplier_name} (MST: ${req.params.tax_id})`, 'info');
-
-        res.json({ message: 'Supplier updated' });
+        const result = await SupplierModule.update(req.params.tax_id, supplier_name);
+        logActivity(req.user.id, `Cập nhật thông tin nhà cung cấp: ${supplier_name} (MST: ${req.params.tax_id})`, 'info').catch(console.error);
+        res.json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -139,20 +126,13 @@ router.put('/:tax_id', verifyToken, isAdmin, async (req, res) => {
  *         description: Nhà cung cấp đã có lịch sử kho
  */
 // Delete supplier (Admin)
-router.delete('/:tax_id', verifyToken, isAdmin, async (req, res) => {
+router.delete('/:tax_id', verifyToken, isAdmin, async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        
-        await pool.request()
-            .input('tax', sql.Char(10), req.params.tax_id)
-            .execute('sp_DeleteSupplier');
-
-        // Ghi log hoạt động sau khi xóa thành công
-        await logActivity(req.user.id, `Xóa nhà cung cấp (MST: ${req.params.tax_id})`, 'danger');
-
-        res.json({ message: 'Supplier deleted' });
+        const result = await SupplierModule.delete(req.params.tax_id);
+        logActivity(req.user.id, `Xóa nhà cung cấp (MST: ${req.params.tax_id})`, 'danger').catch(console.error);
+        res.json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

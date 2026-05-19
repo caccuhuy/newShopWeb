@@ -81,13 +81,8 @@ app.use('/api/logs', logsRoutes);
 app.use('/api/customer-products', customerProductsRoutes);
 
 // Global error handler
-app.use((err, req, res, next) => {
-    console.error('Unhandled Error:', err);
-    res.status(err.status || 500).json({
-        error: err.message || 'Lỗi server nội bộ',
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-});
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

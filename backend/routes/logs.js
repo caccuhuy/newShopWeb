@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
+const LogModule = require('../modules/LogModule');
 
 /**
  * @swagger
@@ -23,16 +23,12 @@ const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
  *         description: Danh sách nhật ký
  */
 // Get all activity logs (Admin only)
-router.get('/', verifyToken, isAdmin, async (req, res) => {
+router.get('/', verifyToken, isAdmin, async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request().execute('vw_ActivityLog');
-       
-        console.log(`Fetched ${result.recordset.length} logs from DB`);
-        res.json(result.recordset);
+        const logs = await LogModule.getAll();
+        res.json(logs);
     } catch (err) {
-        console.error('Error fetching logs:', err.message);
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -61,20 +57,13 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
  *         description: Thêm nhật ký thành công
  */
 // Add a new activity log
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, async (req, res, next) => {
     const { action, type } = req.body;
-    const userId = req.user.id;
-
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('user_id', sql.VarChar, userId)
-            .input('action', sql.NVarChar, action)
-            .input('type', sql.VarChar, type || 'info')
-            .execute('sp_Log');
-        res.status(201).json({ message: 'Log added successfully' });
+        const result = await LogModule.create(req.user.id, action, type);
+        res.status(201).json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

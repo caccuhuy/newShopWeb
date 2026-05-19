@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { sql, poolPromise } = require('../config/db');
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
+const CategoryModule = require('../modules/CategoryModule');
 
 /**
  * @swagger
@@ -22,13 +22,12 @@ const { logActivity } = require('../utils/logger');
  *         description: Danh sách danh mục
  */
 // Get all categories
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request().query("SELECT * FROM Categories");
-        res.json(result.recordset);
+        const categories = await CategoryModule.getAll();
+        res.json(categories);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -54,19 +53,15 @@ router.get('/', async (req, res) => {
  *         description: Tạo thành công
  */
 // Create category (Admin)
-router.post('/', verifyToken, isAdmin, async (req, res) => {
+router.post('/', verifyToken, isAdmin, async (req, res, next) => {
     const { cat_name } = req.body;
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('name', sql.NVarChar, cat_name)
-            .execute('sp_AddCategories');
-        
-        await logActivity(req.user.id, `Thêm danh mục mới: ${cat_name}`, 'success');
-
-        res.status(201).json({ message: 'Category created' });
+        const result = await CategoryModule.create(cat_name);
+        // Log activity asynchronously
+        logActivity(req.user.id, `Thêm danh mục mới: ${cat_name}`, 'success').catch(console.error);
+        res.status(201).json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -98,20 +93,14 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
  *         description: Cập nhật thành công
  */
 // Update category (Admin)
-router.put('/:id', verifyToken, isAdmin, async (req, res) => {
+router.put('/:id', verifyToken, isAdmin, async (req, res, next) => {
     const { cat_name } = req.body;
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .input('name', sql.NVarChar, cat_name)
-            .execute('sp_AlterCategories');
-        
-        await logActivity(req.user.id, `Cập nhật tên danh mục thành: ${cat_name} (ID: ${req.params.id})`, 'info');
-
-        res.json({ message: 'Category updated' });
+        const result = await CategoryModule.update(req.params.id, cat_name);
+        logActivity(req.user.id, `Cập nhật tên danh mục thành: ${cat_name} (ID: ${req.params.id})`, 'info').catch(console.error);
+        res.json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -136,19 +125,13 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
  *         description: Danh mục có sản phẩm ràng buộc
  */
 // Delete category (Admin)
-router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async (req, res, next) => {
     try {
-        const pool = await poolPromise;
-        
-        await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .execute('sp_DeleteCategories');
-        
-        await logActivity(req.user.id, `Xóa danh mục (ID: ${req.params.id})`, 'danger');
-
-        res.json({ message: 'Category deleted' });
+        const result = await CategoryModule.delete(req.params.id);
+        logActivity(req.user.id, `Xóa danh mục (ID: ${req.params.id})`, 'danger').catch(console.error);
+        res.json(result);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

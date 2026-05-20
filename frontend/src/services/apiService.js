@@ -259,6 +259,17 @@ export const apiService = {
         return data;
     },
 
+    changeStaffPassword: async (currentPassword, newPassword) => {
+        const response = await fetch(`${BASE_URL}/staff/profile/password`, {
+            method: 'PUT',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || data.message || 'Lỗi đổi mật khẩu');
+        return data;
+    },
+
     // Orders
     getMyOrders: async () => {
         const response = await fetch(`${BASE_URL}/orders/my-orders`, {

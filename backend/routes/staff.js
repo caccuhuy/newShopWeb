@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
+const { verifyToken, isAdmin, isStaff } = require('../middleware/authMiddleware');
 const { logActivity } = require('../utils/logger');
 const StaffModule = require('../modules/StaffModule');
 
@@ -150,6 +150,46 @@ router.put('/:id/reset-password', verifyToken, isAdmin, async (req, res, next) =
     const { password } = req.body;
     try {
         const result = await StaffModule.resetPassword(req.params.id, password);
+        res.json(result);
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * @swagger
+ * /api/staff/profile/password:
+ *   put:
+ *     summary: Thay đổi mật khẩu cá nhân của nhân viên
+ *     tags: [Staff]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Đổi mật khẩu thành công
+ *       400:
+ *         description: Mật khẩu hiện tại không đúng
+ */
+// Change own password for staff/admin
+router.put('/profile/password', verifyToken, isStaff, async (req, res, next) => {
+    const { currentPassword, newPassword } = req.body;
+    try {
+        const result = await StaffModule.changePassword(req.user.id, currentPassword, newPassword);
+        logActivity(req.user.id, 'Tự thay đổi mật khẩu', 'info').catch(console.error);
         res.json(result);
     } catch (err) {
         next(err);

@@ -113,10 +113,31 @@
     border: none;
     cursor: pointer;
     transition: color 0.2s;
+    display: flex;
+    align-items: center;
 }
 
 .logoutBtn:hover {
     color: #ef4444;
+}
+
+.settingsBtn {
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.settingsBtn:hover {
+    color: #3b82f6;
 }
 
 .mr2 {

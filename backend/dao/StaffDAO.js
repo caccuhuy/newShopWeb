@@ -7,6 +7,16 @@ class StaffDAO {
         return result.recordset;
     }
 
+    static async getPasswordHash(userId) {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('userId', sql.VarChar, userId)
+            .query('SELECT pasword_hash FROM Users WHERE user_id = @userId');
+        
+        if (result.recordset.length === 0) return null;
+        return result.recordset[0].pasword_hash;
+    }
+
     static async create(name, email, phoneNumber, role, passwordHash) {
         const pool = await poolPromise;
         const result = await pool.request()

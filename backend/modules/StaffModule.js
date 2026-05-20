@@ -46,6 +46,24 @@ class StaffModule {
         await StaffDAO.resetPassword(userId, hash);
         return { message: 'Reset mật khẩu thành công' };
     }
+
+    static async changePassword(userId, currentPassword, newPassword) {
+        if (!userId) throw new AppError('Mã người dùng không hợp lệ', 400);
+        if (!currentPassword || !newPassword) throw new AppError('Vui lòng cung cấp mật khẩu hiện tại và mật khẩu mới', 400);
+
+        const currentHashDb = await StaffDAO.getPasswordHash(userId);
+        if (!currentHashDb) throw new AppError('Không tìm thấy tài khoản', 404);
+
+        const inputCurrentHash = crypto.createHash('sha256').update(currentPassword).digest('hex');
+        if (inputCurrentHash !== currentHashDb) {
+            throw new AppError('Mật khẩu hiện tại không đúng', 400);
+        }
+
+        const newHash = crypto.createHash('sha256').update(newPassword).digest('hex');
+        await StaffDAO.resetPassword(userId, newHash);
+        
+        return { message: 'Đổi mật khẩu thành công' };
+    }
 }
 
 module.exports = StaffModule;

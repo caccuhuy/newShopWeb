@@ -124,6 +124,9 @@ router.get('/:id', async (req, res, next) => {
  *                 type: string
  *               cat_id:
  *                 type: integer
+ *               specs_json:
+ *                 type: string
+ *                 description: "Thông số kỹ thuật dạng JSON (ví dụ: {\"screen\":\"6.5 inch\"})"
  *               unit_price:
  *                 type: number
  *               brand:
@@ -184,6 +187,9 @@ router.post('/', verifyToken, isAdmin, upload.single('image'), async (req, res, 
  *                 type: string
  *               cat_id:
  *                 type: integer
+ *               specs_json:
+ *                 type: string
+ *                 description: "Thông số kỹ thuật dạng JSON (ví dụ: {\"screen\":\"6.5 inch\"})"
  *               unit_price:
  *                 type: number
  *               brand:

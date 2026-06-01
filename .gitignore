@@ -17,4 +17,4 @@ __pycache__/
 *.log
 update_data.py
 
-doccument/
+# document

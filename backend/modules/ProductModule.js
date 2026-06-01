@@ -102,7 +102,8 @@ class ProductModule {
             throw new AppError('Thông tin sản phẩm không đầy đủ (Tên, Danh mục, Giá bán là bắt buộc)', 400);
         }
 
-        await ProductDAO.create(name, cat_id, specs_json, price, brand, warranty, imageUrl);
+        const finalSpecs = specs_json || '{}';
+        await ProductDAO.create(name, cat_id, finalSpecs, price, brand, warranty, imageUrl);
         return { message: 'Product created' };
     }
 
@@ -113,7 +114,8 @@ class ProductModule {
             throw new AppError('Thông tin sản phẩm không đầy đủ (Tên, Danh mục, Giá bán là bắt buộc)', 400);
         }
 
-        await ProductDAO.update(id, name, cat_id, specs_json, price, brand, warranty, imageUrl);
+        const finalSpecs = specs_json || '{}';
+        await ProductDAO.update(id, name, cat_id, finalSpecs, price, brand, warranty, imageUrl);
         return { message: 'Product updated' };
     }
 
